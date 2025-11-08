@@ -40,9 +40,9 @@ export const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: colors.brand[400],
-      light: colors.brand[300],
-      dark: colors.brand[500],
+      main: colors.brand[500],
+      light: colors.brand[400],
+      dark: colors.brand[600],
       contrastText: "#ffffff",
     },
     secondary: {
