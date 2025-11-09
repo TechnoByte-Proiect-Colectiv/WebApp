@@ -25,7 +25,7 @@ export const CartSummary: React.FC<{
         </Typography>
         <Typography
           variant="h6"
-          className="font-bold text-brand-500 md:text-justify text-end "
+          className="font-bold text-brand-500 md:text-end text-justify"
         >
           {totalPrice.toFixed(2)} {currency}
         </Typography>
