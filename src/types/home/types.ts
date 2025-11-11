@@ -21,3 +21,24 @@ export interface HeroSectionProps {
   buttonText?: string;
   onButtonClick?: () => void;
 }
+
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+  currency: string;
+  image: string;
+  description: string;
+  category?: string;
+  stock?: number;
+  reviews?: Review[];
+}
+
+export interface Review {
+  id: number;
+  user_id: number;
+  product_id: number;
+  comment: string;
+  rating: number;
+  created_at: string;
+}
