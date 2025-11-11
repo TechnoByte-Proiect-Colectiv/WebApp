@@ -1,5 +1,6 @@
 export const ROUTES = {
     HOME: '/',
+    TESTING: '/testing_cart_list',
     
     // Products
     PRODUCTS: '/products',
