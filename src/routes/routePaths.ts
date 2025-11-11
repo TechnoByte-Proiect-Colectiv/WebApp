@@ -1,6 +1,7 @@
 export const ROUTES = {
     HOME: '/',
     TESTING: '/testing_cart_list',
+    TESTING_PRODUCT_PAGE: '/testing_product_page',
     
     // Products
     PRODUCTS: '/products',
