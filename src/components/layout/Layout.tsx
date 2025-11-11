@@ -1,11 +1,12 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
+import { useCart } from "../../context/CartContext";
 
 export const Layout: React.FC = () => {
   return (
     <div className="flex flex-col bg-neutral-50 dark:bg-neutral-900">
       {/* Header with Navigation */}
-      <Header cartItemCount={0} />
+      <Header/>
 
       <main className="flex-1 w-full mx-auto min-h-screen">
         <Outlet />

@@ -1,4 +1,3 @@
-// ProductCartList.tsx
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { EmptyCart } from "./EmptyCart";
@@ -31,7 +30,7 @@ export const ProductCartList = <T,>({
   }, 0);
 
   return (
-    <Box sx={{ mt: 6 }}>
+    <Box sx={{ mt: 4 }}>
       {title && (
         <Typography
           variant="h4"

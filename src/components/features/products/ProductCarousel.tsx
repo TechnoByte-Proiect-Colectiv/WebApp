@@ -6,10 +6,12 @@ import { Navigation } from "swiper/modules";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { AppPromoCard } from "../../common/AppPromoCard";
+import { ProductCard } from "../../../pages/Product/ProductCard";
+import { ProductType } from "../../../types/product/product";
 
 interface ProductCarouselProps {
   title: string;
-  products: number[];
+  products: ProductType[];
   showPromoCard?: boolean;
 }
 
@@ -41,15 +43,13 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
           className="!py-4"
         >
           {showPromoCard && (
-            <SwiperSlide className="!w-auto h-40">
+            <SwiperSlide className="!w-auto h-80">
               <AppPromoCard />
             </SwiperSlide>
           )}
           {products.map((product, index) => (
-            <SwiperSlide key={index} className="!w-auto">
-              <Card className="flex flex-row items-center justify-center h-40 w-[240px] bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-brand-400 dark:hover:border-brand-500 transition-all hover:shadow-lg">
-                {product}
-              </Card>
+            <SwiperSlide key={index} className="!w-[210px] !h-80">
+              <ProductCard product={product}></ProductCard>
             </SwiperSlide>
           ))}
         </Swiper>

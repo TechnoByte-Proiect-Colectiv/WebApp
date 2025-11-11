@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ProductService } from "../../services/ProductService";
-import { Product, Review } from "../../types/home/types";
 import { Container, Typography, Box, Button, Collapse, Card, CardContent } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarBorderIcon from "@mui/icons-material/StarBorder";  
+import { ProductType } from "../../types/product/product";
+import { useProducts } from "../../context/ProductContext";
+import { useCart } from "../../context/CartContext";
+import { Review } from "../../types/product/review";
 
-export const ProductPage: React.FC<{ product?: Product; reviews?: Review[] }> = ({ product: propProduct, reviews: propReviews }) => {
+export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propReviews }) => {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
+  const { mockProducts } = useProducts();
+  const { getProductQuantity, isInCart, addToCart } = useCart();
+
+  const [product, setProduct] = useState<ProductType | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,30 +24,12 @@ export const ProductPage: React.FC<{ product?: Product; reviews?: Review[] }> = 
   const [showReviews, setShowReviews] = useState(false);
 
   useEffect(() => {
-    if(propProduct) {
-        setProduct(propProduct);
-        setReviews(propReviews || []);
-        setLoading(false);
-        return;
-    }
-
     if (!id) return;
 
-    const fetchProduct = async () => {
-        try {
-            const prod = await ProductService.getById(+id);
-            const revs = await ProductService.getReviews(+id);
-            setProduct(prod);
-            setReviews(revs);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    fetchProduct();
-  }, [id, propProduct, propReviews]);
+    const prod = mockProducts.find(p => p.id === id);
+    setProduct(prod || null);
+    setLoading(false);
+  }, [id, mockProducts]);
 
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Product not found</div>;
@@ -75,10 +63,10 @@ export const ProductPage: React.FC<{ product?: Product; reviews?: Review[] }> = 
               Price: {product.price} {product.currency}
             </Typography>
             <Typography variant="subtitle1" mt={1}>
-              Category: {product.category || "N/A"}
+            Categories: {product.categories.map(cat => cat.name).join(", ")}
             </Typography>
             <Typography variant="subtitle1" mt={1}>
-              Stock: {product.stock || "N/A"}
+              Stock: N/A
             </Typography>
             <Box display="flex" alignItems="center" justifyContent="flex-end" gap={0.5} mt={1}>
                 <Typography variant="subtitle1">Rating:</Typography>
@@ -94,12 +82,16 @@ export const ProductPage: React.FC<{ product?: Product; reviews?: Review[] }> = 
           </Box>
 
           <Box display="flex" justifyContent="flex-end" gap={2} mt={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<ShoppingCartIcon />}
+          <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart(product);
+              }}
+              variant={isInCart(product.id) ? "outlined" : "contained"}
             >
-              Add to cart
+              {isInCart(product.id)
+                ? `In basket (${getProductQuantity(product.id)})`
+                : "Add to cart"}
             </Button>
             <Button
               variant="outlined"
@@ -124,7 +116,8 @@ export const ProductPage: React.FC<{ product?: Product; reviews?: Review[] }> = 
             {showDescription ? "-" : "+"} Description
           </Button>
           <Collapse in={showDescription}>
-            <Typography>{product.description}</Typography>
+            {/* <Typography>{product.description}</Typography> */}
+            <Typography>Description....</Typography>
           </Collapse>
         </Box>
 

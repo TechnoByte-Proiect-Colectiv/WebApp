@@ -1,6 +1,5 @@
 import {
   useState,
-  useRef,
   useEffect,
   FC,
 } from "react";
@@ -24,6 +23,8 @@ import { userService } from "../../services/userService";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../routes/routePaths";
 
 type AuthMode = "login" | "signup";
 
@@ -71,10 +72,23 @@ export const LoginButton: FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState(userService.getCurrentUser());
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Update user when auth state changes
     setCurrentUser(userService.getCurrentUser());
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const handleUserUpdate = () => {
+      setCurrentUser(userService.getCurrentUser());
+    };
+
+    window.addEventListener('userUpdated', handleUserUpdate);
+
+    return () => {
+      window.removeEventListener('userUpdated', handleUserUpdate);
+    };
+  }, []);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -82,6 +96,11 @@ export const LoginButton: FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleProfileClick = () => {
+    navigate(ROUTES.ACCOUNT);
+    handleMenuClose();
   };
 
   const handleAuthClick = () => {
@@ -124,8 +143,6 @@ export const LoginButton: FC = () => {
 
       await userService.login({ email: loginEmail, password: loginPassword });
       login(CONNECTION_TOKEN
-        // setCurrentUser(userService.getCurrentUser());
-        // handleDialogClose();
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -200,6 +217,12 @@ export const LoginButton: FC = () => {
           <MenuItem disabled>
             <span className="text-xs text-neutral-500">{currentUser.email}</span>
           </MenuItem>
+
+          <MenuItem onClick={handleProfileClick}>
+            <AccountCircleIcon fontSize="small" className="mr-2" />
+            Profile
+          </MenuItem>
+
           <MenuItem onClick={handleLogout} disabled={loading}>
             <LogoutIcon fontSize="small" className="mr-2" />
             Logout

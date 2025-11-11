@@ -1,55 +1,42 @@
 export const ROUTES = {
-    HOME: '/',
-    TESTING: '/testing_cart_list',
-    TESTING_PRODUCT_PAGE: '/testing_product_page',
-    TESTING_USER_PAGE: '/testing_user_page',
-    
-    // Products
-    PRODUCTS: '/products',
-    PRODUCT_DETAIL: '/products/:id',
-    CATEGORY: '/category/:categoryName',
-    SEARCH: '/search',
-    
-    // Cart & Checkout
-    CART: '/cart',
-    CHECKOUT: '/checkout',
-    
-    // User Account (protected)
-    ACCOUNT: '/account',
-    PROFILE: '/account/profile',
-    SETTINGS: '/account/edit', // this is not in protected for testing
-    ORDERS: '/account/orders',
-    ORDER_DETAIL: '/account/orders/:orderId',
-    WISHLIST: '/account/wishlist',
-    ADDRESSES: '/account/addresses',
-    
-    // Auth
-    LOGIN: '/login',
-    REGISTER: '/register',
-    FORGOT_PASSWORD: '/forgot-password',
-    RESET_PASSWORD: '/reset-password/:token',
-    
-    // Static pages
-    ABOUT: '/about',
-    CONTACT: '/contact',
-    TERMS: '/terms',
-    PRIVACY: '/privacy',
-    
-    // Admin (protected)
-    ADMIN: '/admin',
-    ADMIN_PRODUCTS: '/admin/products',
-    ADMIN_ORDERS: '/admin/orders',
-    ADMIN_USERS: '/admin/users',
-    
-    // Error
-    NOT_FOUND: '*',
-    FORBIDDEN: '/forbidden',
-  } as const;
+  HOME: "/",
 
-  export const generatePath = {
-    productDetail: (id: string) => `/products/${id}`,
-    category: (categoryName: string) => `/category/${categoryName}`,
-    orderDetail: (orderId: string) => `/account/orders/${orderId}`,
-    resetPassword: (token: string) => `/reset-password/${token}`,
-  };
-  
+  // Products
+  PRODUCTS: "/products",
+  PRODUCT_DETAIL: "/products/:id",
+
+  // Cart & Checkout
+  CART: "/cart",
+  CHECKOUT: "/checkout",
+
+  // User Account (protected)
+  ACCOUNT: "/account",
+  SETTINGS: "/account/edit", 
+
+  // Auth
+  LOGIN: "/login",
+  REGISTER: "/register",
+
+  // Static pages
+  ABOUT: "/about",
+  CONTACT: "/contact",
+  TERMS: "/terms",
+  PRIVACY: "/privacy",
+
+  // Admin (protected)
+  ADMIN: "/admin",
+  ADMIN_PRODUCTS: "/admin/products",
+  ADMIN_ORDERS: "/admin/orders",
+  ADMIN_USERS: "/admin/users",
+
+  // Error
+  NOT_FOUND: "*",
+  FORBIDDEN: "/forbidden",
+} as const;
+
+export const generatePath = {
+  productDetail: (id: string) => `/products/${id}`,
+  category: (categoryName: string) => `/category/${categoryName}`,
+  orderDetail: (orderId: string) => `/account/orders/${orderId}`,
+  resetPassword: (token: string) => `/reset-password/${token}`,
+};

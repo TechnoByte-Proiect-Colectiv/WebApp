@@ -5,7 +5,7 @@ export const AppPromoCard = () => {
   return (
     <Card
       elevation={3}
-      className="min-w-[240px] w-[40vw] max-w-[500px] h-40 flex flex-col items-center justify-center text-center"
+      className="min-w-[240px] w-[40vw] max-w-[500px] h-80 flex flex-col items-center justify-center text-center"
       sx={{ bgcolor: "primary.light", color: "primary" }}
     >
       <CardContent>

@@ -7,6 +7,8 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./routes/AppRoutes";
 import { DarkModeProvider, useDarkMode } from "./context/DarkModeContext";
+import { CartProvider } from "./context/CartContext";
+import { ProductsProvider } from "./context/ProductContext";
 
 function AppContent() {
   const { darkMode } = useDarkMode();
@@ -15,11 +17,15 @@ function AppContent() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
+      <ProductsProvider>
+        <CartProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </BrowserRouter>
+        </CartProvider>
+      </ProductsProvider>
     </ThemeProvider>
   );
 }

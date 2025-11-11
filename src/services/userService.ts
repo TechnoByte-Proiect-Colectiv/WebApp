@@ -1,27 +1,4 @@
-// Mocked user data
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface SignUpCredentials {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
+import { AuthResponse, LoginCredentials, SignUpCredentials, User } from "../types/user/user";
 
 // Mock database
 const mockUsers: Record<string, { password: string; user: User }> = {
@@ -56,6 +33,7 @@ export const userService = {
    * - Email: user@example.com, Password: password123
    * - Email: demo@example.com, Password: demo123
    */
+
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -133,6 +111,31 @@ export const userService = {
       user: newUser,
       token,
     };
+  },
+
+  async updateUser(updatedData: Partial<User>): Promise<User> {
+    // Simulează întârziere rețea
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    if (!currentUser) {
+      throw new Error("Niciun utilizator nu este autentificat.");
+    }
+
+    // Îmbină datele vechi cu cele noi
+    const updatedUser = { ...currentUser, ...updatedData };
+
+    // Actualizează "baza de date" mock
+    if (mockUsers[updatedUser.email]) {
+      mockUsers[updatedUser.email].user = updatedUser;
+    } 
+
+    // Actualizează starea locală și localStorage
+    currentUser = updatedUser;
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+
+    window.dispatchEvent(new Event('userUpdated'));
+
+    return updatedUser;
   },
 
   /**

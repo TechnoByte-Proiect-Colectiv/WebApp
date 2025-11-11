@@ -5,14 +5,15 @@ import { useDarkMode } from "../../context/DarkModeContext";
 import { SearchBar } from "../common/SearchBar";
 import { CartIcon } from "../common/CartIcon";
 import { LoginButton } from "../common/LoginButton";
+import { useCart } from "../../context/CartContext";
 
 interface HeaderProps {
-  cartItemCount?: number;
   onSearch?: (query: string) => void;
 }
 
-export const Header: FC<HeaderProps> = ({ cartItemCount = 0, onSearch }) => {
+export const Header: FC<HeaderProps> = ({ onSearch }) => {
   const { darkMode, toggleDarkMode } = useDarkMode();
+  const { getCartItemsCount } = useCart();
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-900 dark:to-neutral-800 shadow-md border-b border-neutral-200 dark:border-neutral-700">
@@ -48,7 +49,7 @@ export const Header: FC<HeaderProps> = ({ cartItemCount = 0, onSearch }) => {
           {/* Right Section: Actions */}
           <div className="flex items-center gap-3 shrink-0">
             {/* Cart Icon */}
-            <CartIcon itemCount={cartItemCount} />
+            <CartIcon itemCount={getCartItemsCount()} />
 
             {/* Login Button */}
             <LoginButton />

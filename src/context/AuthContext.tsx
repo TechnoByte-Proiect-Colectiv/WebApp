@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { userService, User } from "../services/userService";
+import { userService } from "../services/userService";
+import { User } from "../types/user/user";
 
 interface AuthContextType {
     token: string | null;
@@ -40,29 +41,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  const navigate = useNavigate();
-
   const login = (newToken: string) => {
     setToken(newToken);
     localStorage.setItem("authToken", newToken);
-
-    // TODO - modify with real auth
-    // setIsAuthenticated(true);
-    // const currentUser = userService.getCurrentUser();
-    // setUser(currentUser);
-    // console.log("User logged in");
-    // callback();
   };
 
   const logout = () => {
     setToken(null);
     localStorage.removeItem("authToken");
-
-    // TODO - modify with real logout
-    // setIsAuthenticated(false);
-    // setUser(null);
-    // console.log("User logged out");
-    // callback();
   };
 
   const contextValue = useMemo(
