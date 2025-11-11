@@ -11,6 +11,13 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface SignUpCredentials {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 export interface AuthResponse {
   user: User;
   token: string;
@@ -68,6 +75,62 @@ export const userService = {
 
     return {
       user: mockUser.user,
+      token,
+    };
+  },
+
+  /**
+   * Sign up with new user credentials
+   */
+  async signup(credentials: SignUpCredentials): Promise<AuthResponse> {
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Validation
+    if (!credentials.name || !credentials.email || !credentials.password) {
+      throw new Error("All fields are required");
+    }
+
+    if (credentials.password !== credentials.confirmPassword) {
+      throw new Error("Passwords do not match");
+    }
+
+    if (credentials.password.length < 6) {
+      throw new Error("Password must be at least 6 characters");
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.email)) {
+      throw new Error("Invalid email format");
+    }
+
+    // Check if user already exists
+    if (mockUsers[credentials.email]) {
+      throw new Error("Email already registered");
+    }
+
+    // Create new user
+    const newUser: User = {
+      id: `user_${Date.now()}`,
+      name: credentials.name,
+      email: credentials.email,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`,
+    };
+
+    // Add to mock database
+    mockUsers[credentials.email] = {
+      password: credentials.password,
+      user: newUser,
+    };
+
+    const token = `token_${Date.now()}_${Math.random()}`;
+    currentToken = token;
+    currentUser = newUser;
+
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+
+    return {
+      user: newUser,
       token,
     };
   },
