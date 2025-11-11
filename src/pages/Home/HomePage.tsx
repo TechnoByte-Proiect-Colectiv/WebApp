@@ -3,16 +3,33 @@ import { HeroSection } from "./HeroSection/HeroSection";
 import { CategorySection } from "./CategorySection";
 import { Checkroom, Devices, Kitchen, MenuBook } from "@mui/icons-material";
 import { ProductCarousel } from "../../components/features/products/ProductCarousel";
+import { useProducts } from "../../context/ProductContext";
+import { LazyLoadWrapper } from "../../components/common/LazyLoadWrapper";
 
 export const HomePage = () => {
   const categories = [
-    { name: "Electronics", icon: Devices, color: "primary" },
-    { name: "Fashion", icon: Checkroom, color: "secondary" },
-    { name: "Home & Kitchen", icon: Kitchen, color: "success" },
-    { name: "Books & Media", icon: MenuBook, color: "info" },
+    { name: "Electronics", icon: Devices, color: "primary", slug: "elect" },
+    { name: "Fashion", icon: Checkroom, color: "secondary", slug: "fashion" },
+    {
+      name: "Home & Kitchen",
+      icon: Kitchen,
+      color: "success",
+      slug: "home_and_kitchen",
+    },
+    {
+      name: "Books & Media",
+      icon: MenuBook,
+      color: "info",
+      slug: "books_and_media",
+    },
   ];
 
-  const mockProducts = [1, 2, 3, 4, 5, 6, 7, 8];
+  const { mockProducts } = useProducts();
+
+  const getRandomProducts = (products: any[], count: number) => {
+    const shuffled = [...products].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
 
   return (
     <div className="">
@@ -26,29 +43,37 @@ export const HomePage = () => {
 
         <ProductCarousel
           title="Deals of the Day"
-          products={mockProducts}
+          products={getRandomProducts(mockProducts, 10)}
           showPromoCard
         ></ProductCarousel>
 
-        <ProductCarousel
-          title="Top Picks"
-          products={mockProducts}
-        ></ProductCarousel>
+        <LazyLoadWrapper placeholderHeight={350}>
+          <ProductCarousel
+            title="Top Picks"
+            products={getRandomProducts(mockProducts, 10)}
+          ></ProductCarousel>
+        </LazyLoadWrapper>
 
-        <ProductCarousel
-          title="Recommended for you"
-          products={mockProducts}
-        ></ProductCarousel>
+        <LazyLoadWrapper placeholderHeight={350}>
+          <ProductCarousel
+            title="Recommended for you"
+            products={getRandomProducts(mockProducts, 10)}
+          ></ProductCarousel>
+        </LazyLoadWrapper>
 
-        <ProductCarousel
-          title="Trending in Electronics"
-          products={mockProducts}
-        ></ProductCarousel>
+        <LazyLoadWrapper placeholderHeight={350}>
+          <ProductCarousel
+            title="Trending in Electronics"
+            products={getRandomProducts(mockProducts, 10)}
+          ></ProductCarousel>
+        </LazyLoadWrapper>
 
-        <ProductCarousel
-          title="Why did the chicken cross the street?"
-          products={mockProducts}
-        ></ProductCarousel>
+        <LazyLoadWrapper placeholderHeight={350}>
+          <ProductCarousel
+            title="Why did the chicken cross the street?"
+            products={getRandomProducts(mockProducts, 10)}
+          ></ProductCarousel>
+        </LazyLoadWrapper>
       </Container>
     </div>
   );

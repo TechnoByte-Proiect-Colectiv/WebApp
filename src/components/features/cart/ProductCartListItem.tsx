@@ -1,10 +1,12 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { generatePath } from "../../../routes/routePaths";
 
 interface ProductCartListItemProps {
   product: {
     product: {
-      id: number;
+      id: string;
       name: string;
       price: number;
       currency: string;
@@ -21,11 +23,30 @@ export const ProductCartListItem: React.FC<ProductCartListItemProps> = ({
   isPopUpCart = false,
   index,
 }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(generatePath.productDetail(product.id));
+  };
+
   const { product, quantity } = cartProduct;
   const totalPrice = product.price * quantity;
 
   return (
-    <Box className="flex items-center gap-4 flex-1">
+    <Box
+      onClick={handleCardClick}
+      sx={{
+        cursor: "pointer",
+        p: 2,
+        borderRadius: 2,
+        border: 1,
+        borderStyle: "solid",
+        borderColor: "divider",
+        "&:hover": { boxShadow: 2 },
+        transition: "all 0.2s ease-in-out",
+      }}
+      className="flex items-center gap-4 flex-1"
+    >
       {/* Product image */}
       <Box
         className={`${

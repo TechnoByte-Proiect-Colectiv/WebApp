@@ -1,17 +1,18 @@
-import { Product, Review } from '../types/home/types';
+import { ProductType } from "../types/product/product";
+import { Review } from "../types/product/review";
 
-const API_URL = 'http://localhost:8080/api'; // aici trebuie schimbat cu api ul din backend
+const API_URL = 'http://localhost:8080/api'; 
 
 export const ProductService = {
     // get all products
-    getAll: async(): Promise<Product[]> => {
+    getAll: async(): Promise<ProductType[]> => {
         const response = await fetch(`${API_URL}/products`);
         if(!response.ok) throw new Error('Failed to fetch products!');
         return response.json();
     },
 
     // get a product by ID
-    getById: async(id: number): Promise<Product> => {
+    getById: async(id: number): Promise<ProductType> => {
         const response = await fetch(`${API_URL}/products/${id}`);
         if(!response.ok) throw new Error('Product not found!');
         return response.json()
@@ -25,7 +26,7 @@ export const ProductService = {
     },
 
     // create a product
-    createProduct: async(product: Product, token: string): Promise<Product> => {
+    createProduct: async(product: ProductType, token: string): Promise<ProductType> => {
         const response = await fetch(`${API_URL}/products`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -36,7 +37,7 @@ export const ProductService = {
     },
 
     // update a product
-    updateProduct: async(product: Product, token: string): Promise<Product> => {
+    updateProduct: async(product: ProductType, token: string): Promise<ProductType> => {
         const response = await fetch(`${API_URL}/products/${product.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
