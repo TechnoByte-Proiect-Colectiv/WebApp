@@ -1,24 +1,64 @@
+import { Address } from "../types/user/address";
 import { AuthResponse, LoginCredentials, SignUpCredentials, User } from "../types/user/user";
+
+const mockAddresses: Address[] = [
+  {
+    id: "addr-1",
+    type: "billing",
+    firstName: "Ion",
+    lastName: "Popescu",
+    street: "Bulevardul Unirii nr. 10, Bl. 5, Sc. A, Ap. 12",
+    city: "București",
+    county: "Sector 3",
+    postalCode: "030000",
+    country: "România",
+    phoneNumber: "+40 722 123 456",
+    isPrimary: true,
+  },
+  {
+    id: "addr-2",
+    type: "shipping",
+    firstName: "Ion Popescu (Birou)",
+    lastName: "",
+    street: "Calea Floreasca 100",
+    city: "București",
+    county: "Sector 1",
+    postalCode: "014444",
+    country: "România",
+    phoneNumber: "+40 722 123 456",
+    isPrimary: false,
+  },
+  {
+    id: "addr-3",
+    type: "shipping",
+    firstName: "Maria",
+    lastName: "Ionescu",
+    street: "Strada Memorandumului 21",
+    city: "Cluj-Napoca",
+    county: "Cluj",
+    postalCode: "400114",
+    country: "România",
+    phoneNumber: "+40 733 987 654",
+    isPrimary: false,
+  },
+];
+
+export const mockUser: User = {
+  id: "user-101",
+  name: "Ion Popescu",
+  email: "user@example.com",
+  role: "user",
+  avatar: "https://i.pravatar.cc/150?u=ionpopescu",
+  phone: "+40 722 123 456",
+  createdAt: "2023-01-15T10:00:00Z",
+  addresses: mockAddresses,
+};
 
 // Mock database
 const mockUsers: Record<string, { password: string; user: User }> = {
   "user@example.com": {
     password: "password123",
-    user: {
-      id: "1",
-      name: "John Doe",
-      email: "user@example.com",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-    },
-  },
-  "demo@example.com": {
-    password: "demo123",
-    user: {
-      id: "2",
-      name: "Jane Smith",
-      email: "demo@example.com",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane",
-    },
+    user: mockUser,
   },
 };
 
@@ -35,7 +75,6 @@ export const userService = {
    */
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const mockUser = mockUsers[credentials.email];
@@ -61,10 +100,8 @@ export const userService = {
    * Sign up with new user credentials
    */
   async signup(credentials: SignUpCredentials): Promise<AuthResponse> {
-    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Validation
     if (!credentials.name || !credentials.email || !credentials.password) {
       throw new Error("All fields are required");
     }
@@ -81,20 +118,20 @@ export const userService = {
       throw new Error("Invalid email format");
     }
 
-    // Check if user already exists
     if (mockUsers[credentials.email]) {
       throw new Error("Email already registered");
     }
 
-    // Create new user
     const newUser: User = {
       id: `user_${Date.now()}`,
       name: credentials.name,
       email: credentials.email,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`,
+      createdAt: new Date().toISOString(),
+      role: "user",
+      addresses: [],
     };
 
-    // Add to mock database
     mockUsers[credentials.email] = {
       password: credentials.password,
       user: newUser,
@@ -114,22 +151,18 @@ export const userService = {
   },
 
   async updateUser(updatedData: Partial<User>): Promise<User> {
-    // Simulează întârziere rețea
     await new Promise((resolve) => setTimeout(resolve, 400));
 
     if (!currentUser) {
       throw new Error("Niciun utilizator nu este autentificat.");
     }
 
-    // Îmbină datele vechi cu cele noi
     const updatedUser = { ...currentUser, ...updatedData };
 
-    // Actualizează "baza de date" mock
     if (mockUsers[updatedUser.email]) {
       mockUsers[updatedUser.email].user = updatedUser;
     } 
 
-    // Actualizează starea locală și localStorage
     currentUser = updatedUser;
     localStorage.setItem("currentUser", JSON.stringify(updatedUser));
 
@@ -142,7 +175,6 @@ export const userService = {
    * Logout the current user
    */
   async logout(): Promise<void> {
-    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     currentToken = null;
@@ -158,7 +190,6 @@ export const userService = {
   getCurrentUser(): User | null {
     if (currentUser) return currentUser;
 
-    // Try to restore from localStorage
     const storedUser = localStorage.getItem("currentUser");
     if (storedUser) {
       try {
@@ -178,7 +209,6 @@ export const userService = {
   getToken(): string | null {
     if (currentToken) return currentToken;
 
-    // Try to restore from localStorage
     const storedToken = localStorage.getItem("authToken");
     if (storedToken) {
       currentToken = storedToken;

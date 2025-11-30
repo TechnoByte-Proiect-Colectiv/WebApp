@@ -1,6 +1,6 @@
 // src/context/ProductsContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { generateMockProducts } from "./mockProducts";
+import { generateProducts } from "./mockProducts";
 import { ProductType } from "../types/product/product";
 
 interface ProductsContextType {
@@ -13,7 +13,7 @@ export const ProductsProvider = ({ children }: { children: ReactNode }) => {
   const [mockProducts, setMockProducts] = useState<ProductType[]>([]);
 
   useEffect(() => {
-    const generated = generateMockProducts(300);
+    const generated = generateProducts(300);
     setMockProducts(generated);
   }, []);
 

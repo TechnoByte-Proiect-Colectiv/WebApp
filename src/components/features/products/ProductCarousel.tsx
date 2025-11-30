@@ -1,5 +1,5 @@
 import React, { useId } from "react";
-import { Box, Card, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Navigation } from "swiper/modules";
@@ -15,6 +15,8 @@ interface ProductCarouselProps {
   showPromoCard?: boolean;
 }
 
+const MIN_SLOTS_TO_DISPLAY = 6; 
+
 export const ProductCarousel: React.FC<ProductCarouselProps> = ({
   title,
   products,
@@ -23,6 +25,12 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
   const uniqueId = useId().replace(/:/g, "");
   const nextClass = `swiper-next-${uniqueId}`;
   const prevClass = `swiper-prev-${uniqueId}`;
+
+  const totalItems = products.length + (showPromoCard ? 1 : 0);
+  const emptySlotsCount = Math.max(0, MIN_SLOTS_TO_DISPLAY - totalItems);
+  const emptySlots = Array.from({ length: emptySlotsCount });
+
+  const shouldLoop = totalItems > MIN_SLOTS_TO_DISPLAY;
 
   return (
     <Box className="mt-12 relative group">
@@ -34,22 +42,34 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
         <Swiper
           modules={[Navigation]}
           spaceBetween={16}
-          loop={true}
+          watchOverflow={true} 
+          loop={shouldLoop}
           slidesPerView={"auto"}
           navigation={{
             nextEl: `.${nextClass}`,
             prevEl: `.${prevClass}`,
           }}
-          className="!py-4"
+          className="!py-4 flex" 
         >
           {showPromoCard && (
             <SwiperSlide className="!w-auto h-80">
               <AppPromoCard />
             </SwiperSlide>
           )}
+
           {products.map((product, index) => (
-            <SwiperSlide key={index} className="!w-[210px] !h-80">
+            <SwiperSlide key={`prod-${index}`} className="!w-[210px] !h-80">
               <ProductCard product={product}></ProductCard>
+            </SwiperSlide>
+          ))}
+
+          {emptySlots.map((_, index) => (
+            <SwiperSlide key={`empty-${index}`} className="!w-[210px] !h-80">
+               <Box className="w-full h-full rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 flex items-center justify-center bg-neutral-50 dark:bg-neutral-900/50">
+                  <Typography variant="body2" className="text-neutral-400 font-medium">
+                    Empty Slot
+                  </Typography>
+               </Box>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -61,10 +81,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
             top: "50%",
             left: 0,
             transform: "translateY(-50%) translateX(-50%)",
-            bgcolor: "background.paper",
-            "&:hover": {
-              bgcolor: "background.paper",
-            },
+            "&:hover": { bgcolor: "background.paper" },
           }}
         >
           <NavigateBeforeIcon />
@@ -77,10 +94,7 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
             top: "50%",
             right: 0,
             transform: "translateY(-50%) translateX(50%)",
-            bgcolor: "background.paper",
-            "&:hover": {
-              bgcolor: "background.paper",
-            },
+            "&:hover": { bgcolor: "background.paper" },
           }}
         >
           <NavigateNextIcon />

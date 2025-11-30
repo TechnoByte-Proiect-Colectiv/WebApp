@@ -7,6 +7,7 @@ interface ProductCartListItemProps {
   product: {
     product: {
       id: string;
+      slug: string;
       name: string;
       price: number;
       currency: string;
@@ -26,7 +27,7 @@ export const ProductCartListItem: React.FC<ProductCartListItemProps> = ({
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(generatePath.productDetail(product.id));
+    navigate(generatePath.productDetail(product.slug));
   };
 
   const { product, quantity } = cartProduct;

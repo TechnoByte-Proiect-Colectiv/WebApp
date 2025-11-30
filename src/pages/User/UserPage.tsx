@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -13,6 +13,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { userService } from "../../services/userService";
 import { ROUTES } from "../../routes/routePaths";
 import { useAuth } from "../../context/AuthContext";
+import { Address } from "../../types/user/address";
+import { AddressManager } from "../../components/common/AddressManager";
 
 export const UserPage: React.FC = () => {
   const user = userService.getCurrentUser();
@@ -28,14 +30,37 @@ export const UserPage: React.FC = () => {
   const [openReturns, setOpenReturns] = useState(false);
   const [openWarranties, setOpenWarranties] = useState(false);
   const [openAbout, setOpenAbout] = useState(false);
+  const [openAddresses, setOpenAddresses] = useState(false);
+
+  const [addresses, setAddresses] = useState<Address[]>(user?.addresses || []);
 
   const navigate = useNavigate();
 
   const { logout } = useAuth();
 
+  useEffect(() => {
+    if (user && user.addresses) {
+      setAddresses(user.addresses);
+    }
+  }, [user]);
+
   if (!user) {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
+
+  const handleAddAddress = () => {
+    alert("TODO: Add Address");
+  };
+
+  const handleEditAddress = (addr: Address) => {
+    console.log("Edit address", addr);
+  };
+
+  const handleDeleteAddress = (id: string) => {
+    if (window.confirm("Are you sure you want to delete?")) {
+      setAddresses((prev) => prev.filter((a) => a.id !== id));
+    }
+  };
 
   return (
     <Container sx={{ mt: 4 }}>
@@ -95,6 +120,28 @@ export const UserPage: React.FC = () => {
 
       {/* Collapsible sections */}
       <Box mt={4} width="100%">
+        <Box mb={2} sx={{ borderTop: "1px solid #ccc", pt: 1 }}>
+          <Button
+            onClick={() => setOpenAddresses((prev) => !prev)}
+            variant="text"
+            sx={{ textTransform: "none", fontWeight: "bold" }}
+          >
+            {openAddresses ? "-" : "+"} My Addresses
+          </Button>
+          <Collapse in={openAddresses}>
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <AddressManager
+                addresses={addresses}
+                onAddAddress={handleAddAddress}
+                onEditAddress={handleEditAddress}
+                onDeleteAddress={handleDeleteAddress}
+                onSelectAddress={() => {}}
+                selectedAddressId=""
+                allowSelection={false} 
+              />
+            </Box>
+          </Collapse>
+        </Box>
         {/* My Orders */}
         <Box mb={2} sx={{ borderTop: "1px solid #ccc", pt: 1 }}>
           <Button

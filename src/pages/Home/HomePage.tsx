@@ -1,26 +1,26 @@
 import { Container } from "@mui/material";
 import { HeroSection } from "./HeroSection/HeroSection";
 import { CategorySection } from "./CategorySection";
-import { Checkroom, Devices, Kitchen, MenuBook } from "@mui/icons-material";
+import { Checkroom, Devices, Kitchen, SportsBasketball } from "@mui/icons-material";
 import { ProductCarousel } from "../../components/features/products/ProductCarousel";
 import { useProducts } from "../../context/ProductContext";
 import { LazyLoadWrapper } from "../../components/common/LazyLoadWrapper";
 
 export const HomePage = () => {
   const categories = [
-    { name: "Electronics", icon: Devices, color: "primary", slug: "elect" },
+    { name: "Electronics", icon: Devices, color: "primary", slug: "electronics" },
     { name: "Fashion", icon: Checkroom, color: "secondary", slug: "fashion" },
     {
-      name: "Home & Kitchen",
+      name: "Home & Garden",
       icon: Kitchen,
       color: "success",
-      slug: "home_and_kitchen",
+      slug: "home-garden",
     },
     {
-      name: "Books & Media",
-      icon: MenuBook,
+      name: "Sports & Outdoors",
+      icon: SportsBasketball,
       color: "info",
-      slug: "books_and_media",
+      slug: "sports",
     },
   ];
 

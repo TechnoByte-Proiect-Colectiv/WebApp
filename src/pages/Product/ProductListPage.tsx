@@ -11,18 +11,18 @@ import {
   Select,
   MenuItem,
   Grid,
-  Paper, 
+  Paper,
   FormControl,
   FormLabel,
-  RadioGroup, 
+  RadioGroup,
   FormControlLabel,
-  Radio, 
+  Radio,
 } from "@mui/material";
 import { ProductCard } from "./ProductCard";
 import { useProducts } from "../../context/ProductContext";
 import { ProductType } from "../../types/product/product";
 import { useSearchParams } from "react-router-dom";
-import { categories } from "../../context/mockProducts";
+import { MOCK_CATEGORIES } from "../../context/mockProducts";
 
 export const ProductListPage: React.FC = () => {
   const [productsToShow, setProductsToShow] = useState<ProductType[]>([]);
@@ -38,7 +38,9 @@ export const ProductListPage: React.FC = () => {
     if (!categorySlug) {
       return "All Products";
     }
-    const foundCategory = categories.find((cat) => cat.slug === categorySlug);
+    const foundCategory = MOCK_CATEGORIES.find(
+      (cat) => cat.slug === categorySlug
+    );
     return foundCategory ? foundCategory.name : "Products";
   }, [categorySlug]);
 
@@ -46,8 +48,8 @@ export const ProductListPage: React.FC = () => {
     if (!categorySlug) {
       return mockProducts;
     }
-    return mockProducts.filter((product) =>
-      product.categories.some((category) => category.slug === categorySlug)
+    return mockProducts.filter(
+      (product) => product.category.slug === categorySlug
     );
   }, [mockProducts, categorySlug]);
 
@@ -133,7 +135,7 @@ export const ProductListPage: React.FC = () => {
                   control={<Radio />}
                   label="All Categories"
                 />
-                {categories.map((cat) => (
+                {MOCK_CATEGORIES.map((cat) => (
                   <FormControlLabel
                     key={cat.slug}
                     value={cat.slug}

@@ -1,9 +1,14 @@
+import { Address } from "./address";
+
 export interface User {
   id: string;
   name: string;
+  role: 'user' | 'admin' | 'seller';
+  addresses: Address[];
   email: string;
   avatar?: string;
   phone?: string;
+  createdAt: string;
 }
 
 export interface LoginCredentials {

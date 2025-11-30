@@ -44,7 +44,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
           const IconTag = category.icon;
 
           return (
-            <Grid size={{ xs: 6, sm: 6, md: 3 }} key={category.name}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }} key={category.slug}>
               <Paper
                 onClick={() => handleCategoryClick(category.slug)}
                 elevation={3}

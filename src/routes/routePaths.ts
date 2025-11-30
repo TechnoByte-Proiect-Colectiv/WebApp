@@ -3,7 +3,7 @@ export const ROUTES = {
 
   // Products
   PRODUCTS: "/products",
-  PRODUCT_DETAIL: "/products/:id",
+  PRODUCT_DETAIL: "/products/:slug",
 
   // Cart & Checkout
   CART: "/cart",
@@ -16,6 +16,8 @@ export const ROUTES = {
   // Auth
   LOGIN: "/login",
   REGISTER: "/register",
+
+  SELLER: "/seller/:slug",
 
   // Static pages
   ABOUT: "/about",
@@ -35,8 +37,9 @@ export const ROUTES = {
 } as const;
 
 export const generatePath = {
-  productDetail: (id: string) => `/products/${id}`,
+  productDetail: (slug: string) => `/products/${slug}`,
   category: (categoryName: string) => `/category/${categoryName}`,
   orderDetail: (orderId: string) => `/account/orders/${orderId}`,
   resetPassword: (token: string) => `/reset-password/${token}`,
+  seller: (slug: string) => `/seller/${slug}`,
 };

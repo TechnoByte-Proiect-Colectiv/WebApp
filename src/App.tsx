@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { lightTheme, darkTheme } from "./theme/theme";
 import "./App.css";
 import { ThemeProvider } from "@emotion/react";
-import { Button, Card, CssBaseline } from "@mui/material";
+import { Button, Card, Container, CssBaseline } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./routes/AppRoutes";
@@ -21,7 +21,7 @@ function AppContent() {
         <CartProvider>
           <BrowserRouter>
             <AuthProvider>
-              <AppRoutes />
+                <AppRoutes />
             </AuthProvider>
           </BrowserRouter>
         </CartProvider>

@@ -11,7 +11,7 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(generatePath.productDetail(product.id));
+    navigate(generatePath.productDetail(product.slug));
   };
 
   return (
