@@ -8,22 +8,34 @@ import {
   CardContent,
   Collapse,
   Avatar,
+  Chip,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
-import { userService } from "../../services/userService";
+import { mockOrders, userService } from "../../services/userService";
 import { ROUTES } from "../../routes/routePaths";
 import { useAuth } from "../../context/AuthContext";
 import { Address } from "../../types/user/address";
 import { AddressManager } from "../../components/common/AddressManager";
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import { Order } from "../../types/user/order";
+import {
+  OrderSummaryCard,
+  OrderSummaryCardProps,
+} from "../../components/features/order/OrderSummaryCard";
+import { OrderGridComponent } from "../../components/features/order/OrderGridComponent";
+
+const roleType = {
+  user: "Client",
+  admin: "Administrator",
+  seller: "Seller",
+};
 
 export const UserPage: React.FC = () => {
   const user = userService.getCurrentUser();
 
-  const orders: [] = [];
   const reviews: [] = [];
   const returns: [] = [];
   const warranties: [] = [];
-  const about = "No information provided.";
 
   const [openOrders, setOpenOrders] = useState(false);
   const [openReviews, setOpenReviews] = useState(false);
@@ -33,15 +45,43 @@ export const UserPage: React.FC = () => {
   const [openAddresses, setOpenAddresses] = useState(false);
 
   const [addresses, setAddresses] = useState<Address[]>(user?.addresses || []);
+  const [about, setAbout] = useState<string>("No information provided.");
+  const [orders, setOrders] = useState<OrderSummaryCardProps[]>([]);
 
   const navigate = useNavigate();
 
   const { logout } = useAuth();
 
   useEffect(() => {
+    //fetch userAddresses
     if (user && user.addresses) {
       setAddresses(user.addresses);
     }
+
+    if (user && user.createdAt) {
+      const aboutStr =
+        "Account created on " +
+        user.createdAt.split("T")[0] +
+        " at " +
+        user.createdAt.split("T")[1].split("Z")[0];
+      setAbout(aboutStr);
+    }
+
+    //fetch userOrders
+
+    const newOrders: OrderSummaryCardProps[] = [];
+    for (var order of mockOrders) {
+      const modifiedOrder: OrderSummaryCardProps = {
+        id: order.id,
+        createdAt: order.createdAt,
+        total: order.total,
+        currency: order.currency,
+      };
+      newOrders.push(modifiedOrder);
+    }
+    setOrders(newOrders);
+
+    //fetch userReviews
   }, [user]);
 
   if (!user) {
@@ -88,6 +128,14 @@ export const UserPage: React.FC = () => {
           <Box sx={{ textAlign: { xs: "center", md: "right" } }}>
             <Typography variant="h4">{user.name}</Typography>
             <Typography variant="subtitle1">{user.email}</Typography>
+            <Chip
+              icon={<PermIdentityIcon />}
+              label={roleType[user.role]}
+              variant="outlined"
+              sx={{
+                mt: 1,
+              }}
+            />
           </Box>
 
           <Box
@@ -137,49 +185,27 @@ export const UserPage: React.FC = () => {
                 onDeleteAddress={handleDeleteAddress}
                 onSelectAddress={() => {}}
                 selectedAddressId=""
-                allowSelection={false} 
+                allowSelection={false}
               />
             </Box>
           </Collapse>
         </Box>
-        {/* My Orders */}
+        {/* My Orders / Received Orders */}
         <Box mb={2} sx={{ borderTop: "1px solid #ccc", pt: 1 }}>
           <Button
             onClick={() => setOpenOrders((prev) => !prev)}
             variant="text"
             sx={{ textTransform: "none", fontWeight: "bold" }}
           >
-            {openOrders ? "-" : "+"} My Orders
+            {openOrders ? "-" : "+"}{" "}
+            {user.role === "user" ? "My Orders" : "Received Orders"}
           </Button>
           <Collapse in={openOrders}>
             <Box mt={1} display="flex" flexDirection="column" gap={1}>
               {orders.length === 0 ? (
                 <Typography>No orders yet.</Typography>
               ) : (
-                orders.map((order, idx) => (
-                  <Card key={idx}>
-                    <CardContent
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Box>
-                        <Typography>Order #{idx + 1}</Typography>
-                        <Typography variant="subtitle2">
-                          Items: {"N/A"}
-                        </Typography>
-                        <Typography variant="subtitle2">
-                          Date: {"N/A"}
-                        </Typography>
-                      </Box>
-                      <Button variant="contained" size="small">
-                        View
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))
+                <OrderGridComponent orders={orders}></OrderGridComponent>
               )}
             </Box>
           </Collapse>

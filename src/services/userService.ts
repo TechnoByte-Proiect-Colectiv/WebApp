@@ -1,5 +1,159 @@
 import { Address } from "../types/user/address";
-import { AuthResponse, LoginCredentials, SignUpCredentials, User } from "../types/user/user";
+import { Order } from "../types/user/order";
+import {
+  AuthResponse,
+  LoginCredentials,
+  SignUpCredentials,
+  User,
+} from "../types/user/user";
+
+export const mockOrders: Order[] = [
+  {
+    id: "ORD-1001",
+    createdAt: "2025-01-15T10:24:00Z",
+    totalProducts: 320,
+    totalShipping: 25,
+    total: 345,
+    currency: "EUR",
+    paymentMethod: "card",
+    paymentStatus: "paid",
+    orderStatus: "processed",
+    address: {
+      id: "ADDR-2001",
+      type: "shipping",
+      firstName: "Andrei",
+      lastName: "Popescu",
+      street: "Str. Lalelelor 12",
+      city: "Cluj-Napoca",
+      county: "Cluj",
+      postalCode: "400100",
+      country: "RO",
+      phoneNumber: "+40721234567",
+      isPrimary: true,
+    },
+    shipments: [
+      {
+        sellerId: "SELL-1",
+        sellerName: "TechStore",
+        status: "shipped",
+        shippingCost: 25,
+        shippingCurrency: "EUR",
+        items: [
+          {
+            productId: "PROD-101",
+            productName: "Mouse Wireless Logitech",
+            picture: "/img/products/mouse1.jpg",
+            quantity: 1,
+            unitPrice: 25,
+            currency: "EUR",
+          },
+          {
+            productId: "PROD-102",
+            productName: "Tastatură mecanică HyperX",
+            picture: "/img/products/keyboard1.jpg",
+            quantity: 1,
+            unitPrice: 70,
+            currency: "EUR",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ORD-1002",
+    createdAt: "2025-02-03T14:58:00Z",
+    totalProducts: 150,
+    totalShipping: 15,
+    total: 165,
+    currency: "EUR",
+    paymentMethod: "paypal",
+    paymentStatus: "pending",
+    orderStatus: "awaiting_payment",
+    address: {
+      id: "ADDR-2002",
+      type: "billing",
+      firstName: "Maria",
+      lastName: "Ionescu",
+      street: "Bd. Unirii 45",
+      city: "București",
+      county: "București",
+      postalCode: "030102",
+      country: "RO",
+      phoneNumber: "+40744555666",
+      isPrimary: false,
+    },
+    shipments: [
+      {
+        sellerId: "SELL-2",
+        sellerName: "FashionPoint",
+        status: "processing",
+        shippingCost: 15,
+        shippingCurrency: "EUR",
+        items: [
+          {
+            productId: "PROD-201",
+            productName: "Geacă de iarnă",
+            picture: "/img/products/jacket1.jpg",
+            quantity: 1,
+            unitPrice: 120,
+            currency: "EUR",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ORD-1003",
+    createdAt: "2025-02-20T08:11:00Z",
+    totalProducts: 540,
+    totalShipping: 30,
+    total: 570,
+    currency: "EUR",
+    paymentMethod: "card",
+    paymentStatus: "paid",
+    orderStatus: "delivered",
+    address: {
+      id: "ADDR-2003",
+      type: "shipping",
+      firstName: "George",
+      lastName: "Marin",
+      street: "Str. Pajiștei 8",
+      city: "Timișoara",
+      county: "Timiș",
+      postalCode: "300200",
+      country: "RO",
+      phoneNumber: "+40732111222",
+      isPrimary: true,
+    },
+    shipments: [
+      {
+        sellerId: "SELL-3",
+        sellerName: "Home&Stuff",
+        status: "delivered",
+        shippingCost: 30,
+        shippingCurrency: "EUR",
+        items: [
+          {
+            productId: "PROD-301",
+            productName: "Aspirator robot Xiaomi",
+            picture: "/img/products/vacuum1.jpg",
+            quantity: 1,
+            unitPrice: 300,
+            currency: "EUR",
+          },
+          {
+            productId: "PROD-302",
+            productName: "Purificator de aer Philips",
+            picture: "/img/products/airpurifier1.jpg",
+            quantity: 1,
+            unitPrice: 240,
+            currency: "EUR",
+          },
+        ],
+      },
+    ],
+  },
+];
 
 const mockAddresses: Address[] = [
   {
@@ -43,12 +197,34 @@ const mockAddresses: Address[] = [
   },
 ];
 
-export const mockUser: User = {
+const mockUser: User = {
   id: "user-101",
-  name: "Ion Popescu",
+  name: "Ion PopescuUser",
   email: "user@example.com",
   role: "user",
-  avatar: "https://i.pravatar.cc/150?u=ionpopescu",
+  avatar: "https://picsum.photos/200",
+  phone: "+40 722 123 456",
+  createdAt: "2023-01-15T10:00:00Z",
+  addresses: mockAddresses,
+};
+
+const mockSeller: User = {
+  id: "seller-101",
+  name: "Ion PopescuSeller",
+  email: "user@example.com",
+  role: "user",
+  avatar: "https://picsum.photos/200",
+  phone: "+40 722 123 456",
+  createdAt: "2023-01-15T10:00:00Z",
+  addresses: mockAddresses,
+};
+
+const mockAdmin: User = {
+  id: "adm-101",
+  name: "Ion PopescuAdm",
+  email: "user@example.com",
+  role: "user",
+  avatar: "https://picsum.photos/200",
   phone: "+40 722 123 456",
   createdAt: "2023-01-15T10:00:00Z",
   addresses: mockAddresses,
@@ -161,12 +337,12 @@ export const userService = {
 
     if (mockUsers[updatedUser.email]) {
       mockUsers[updatedUser.email].user = updatedUser;
-    } 
+    }
 
     currentUser = updatedUser;
     localStorage.setItem("currentUser", JSON.stringify(updatedUser));
 
-    window.dispatchEvent(new Event('userUpdated'));
+    window.dispatchEvent(new Event("userUpdated"));
 
     return updatedUser;
   },
