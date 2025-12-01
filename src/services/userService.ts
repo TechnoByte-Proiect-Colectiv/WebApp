@@ -57,6 +57,31 @@ export const mockOrders: Order[] = [
           },
         ],
       },
+      {
+        sellerId: "SELL-2",
+        sellerName: "BobTest",
+        status: "processing",
+        shippingCost: 10,
+        shippingCurrency: "EUR",
+        items: [
+          {
+            productId: "PROD-101",
+            productName: "Mouse Wireless Logitech saj as as as as sa as as s",
+            picture: "/img/products/mouse1.jpg",
+            quantity: 1,
+            unitPrice: 25,
+            currency: "EUR",
+          },
+          {
+            productId: "PROD-102",
+            productName: "Tastatură mecanică HyperX",
+            picture: "/img/products/keyboard1.jpg",
+            quantity: 1,
+            unitPrice: 70,
+            currency: "EUR",
+          },
+        ],
+      },
     ],
   },
   {
