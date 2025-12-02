@@ -33,7 +33,7 @@ export const OrderPage: React.FC = () => {
     //HERE CALL API TO GET ITS SLUG.
     //NOT BY ID!
     navigate(generatePath.productDetail(productId));
-  }
+  };
 
   useEffect(() => {
     //nu stiu cat de best practice e,
@@ -61,6 +61,7 @@ export const OrderPage: React.FC = () => {
         Order No. <span className="font-bold">{id}</span>
       </Typography>
       <Typography fontSize={14}>{order?.createdAt}</Typography>
+      <Chip label={order?.orderStatus} color="primary" sx={{ mt: 1 }} />
 
       <Grid
         container
@@ -74,6 +75,76 @@ export const OrderPage: React.FC = () => {
             sm: 8,
           }}
         >
+          {/* billing address */}
+          <Box
+            sx={{
+              mr: 2,
+              mb: 1,
+            }}
+          >
+            <Box
+              sx={{
+                p: 2,
+                border: "1px dashed #ccc",
+                borderRadius: 1
+              }}
+            >
+              <Typography fontSize={20}>Billing Address</Typography>
+              <Typography sx={{
+                mt: 1
+              }}>
+                {order?.billingAddress.firstName}{" "}
+                {order?.billingAddress.lastName}{" "}
+              </Typography>
+              <Typography>
+                {order?.billingAddress.street}
+                {", "}
+                {order?.billingAddress.postalCode}
+                {", "}
+                {order?.billingAddress.city}
+                {", "}
+                {order?.billingAddress.county}
+                {", "}
+                {order?.billingAddress.country}
+              </Typography>
+              <Typography>{order?.billingAddress.phoneNumber}</Typography>
+            </Box>
+          </Box>
+          {/* shipping address */}
+          <Box
+            sx={{
+              mr: 2,
+              mb: 1,
+            }}
+          >
+            <Box
+              sx={{
+                p: 2,
+                border: "1px dashed #ccc",
+                borderRadius: 1
+              }}
+            >
+              <Typography fontSize={20}>Shipping Address</Typography>
+              <Typography sx={{
+                mt: 1
+              }}>
+                {order?.shippingAddress.firstName}{" "}
+                {order?.shippingAddress.lastName}{" "}
+              </Typography>
+              <Typography>
+                {order?.shippingAddress.street}
+                {", "}
+                {order?.shippingAddress.postalCode}
+                {", "}
+                {order?.shippingAddress.city}
+                {", "}
+                {order?.shippingAddress.county}
+                {", "}
+                {order?.shippingAddress.country}
+              </Typography>
+              <Typography>{order?.shippingAddress.phoneNumber}</Typography>
+            </Box>
+          </Box>
           {/* itereaza peste shipments */}
           {order?.shipments.map((shipment, index) => (
             <Card

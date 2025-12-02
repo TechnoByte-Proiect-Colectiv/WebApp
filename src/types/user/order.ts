@@ -23,13 +23,14 @@ export interface OrderShipment {
 export interface Order {
     id: string; //
     createdAt: string; //
-    totalProducts: number;
-    totalShipping: number;
-    total: number;
-    currency: string;
+    totalProducts: number; //
+    totalShipping: number; //
+    total: number; //
+    currency: string; //
     paymentMethod: string;
     paymentStatus: string;
-    orderStatus: string;
-    address: Address;
+    orderStatus: string; //
+    billingAddress: Address; 
+    shippingAddress: Address;
     shipments: OrderShipment[];  
 }
