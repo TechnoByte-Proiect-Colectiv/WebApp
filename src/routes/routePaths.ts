@@ -12,6 +12,7 @@ export const ROUTES = {
   // User Account (protected)
   ACCOUNT: "/account",
   SETTINGS: "/account/edit", 
+  ORDER: "/order/:id",
 
   // Auth
   LOGIN: "/login",
@@ -39,7 +40,7 @@ export const ROUTES = {
 export const generatePath = {
   productDetail: (slug: string) => `/products/${slug}`,
   category: (categoryName: string) => `/category/${categoryName}`,
-  orderDetail: (orderId: string) => `/account/orders/${orderId}`,
   resetPassword: (token: string) => `/reset-password/${token}`,
   seller: (slug: string) => `/seller/${slug}`,
+  order: (id: string) => `/order/${id}`,
 };

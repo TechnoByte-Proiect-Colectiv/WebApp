@@ -1,8 +1,12 @@
 export interface Review {
-    id: number;
-    user_id: number;
-    product_id: number;
+    id: string;
+    user_id: string;
+    product_id: string;
+    postingName: string;
+    avatar?: string;
+    title?: string;
     comment: string;
     rating: number;
     created_at: string;
+    isVerifiedPurchase: boolean;
   }
