@@ -17,6 +17,7 @@ export const ROUTES = {
   // Auth
   LOGIN: "/login",
   REGISTER: "/register",
+  RESET_PASSWORD: "/reset-password",
 
   SELLER: "/seller/:slug",
 
