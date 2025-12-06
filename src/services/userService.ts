@@ -390,6 +390,24 @@ export const userService = {
     };
   },
 
+
+  /**
+   * Send reset password email to user
+   * @param email email string coresponding to the user
+   */
+  async resetPassword(email: string): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const mockUser = mockUsers[email];
+
+    if (!mockUser) {
+      throw new Error("No user with specified email");
+    }
+    
+  },
+
+
+
   async updateUser(updatedData: Partial<User>): Promise<User> {
     await new Promise((resolve) => setTimeout(resolve, 400));
 
