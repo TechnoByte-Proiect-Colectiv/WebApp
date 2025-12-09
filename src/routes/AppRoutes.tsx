@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { HomePage } from "../pages/Home/HomePage";
 import { ForbiddenPage } from "../pages/NotFound/ForbiddenPage";
 import ProtectedRoute from "./ProtectedRoute";
@@ -17,6 +17,12 @@ import { CheckoutPage } from "../pages/Checkout/CheckoutPage";
 import { SellerPage } from "../pages/Seller/SellerPage";
 import { Container } from "@mui/material";
 import { OrderPage } from "../pages/Order/OrderPage";
+
+// Import Admin Panel components
+import AdminLayout from "../AdminPanel/AdminLayout";
+import Dashboard from "../AdminPanel/pages/Dashboard";
+import Users from "../AdminPanel/pages/Users";
+import Products from "../AdminPanel/pages/Products";
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -37,12 +43,19 @@ export const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route path={ROUTES.SETTINGS} element={<UserEditPage />} />
           <Route path={ROUTES.ACCOUNT} element={<UserPage />} />
-          <Route path={ROUTES.ADMIN} element={<TestingDashboardPage />} />
           <Route path={ROUTES.ORDER} element={<OrderPage />} />
         </Route>
 
         {/* --- Page not found --- */}
         <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
+      </Route>
+
+      {/* --- Admin Panel Routes --- */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="users" element={<Users />} />
+        <Route path="products" element={<Products />} />
       </Route>
     </Routes>
   );
