@@ -1,31 +1,42 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { InputBase, Paper, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import { useProducts } from "../../context/ProductContext";
+import { useNavigate } from "react-router-dom"; 
 
-interface SearchBarProps {
-  onSearch?: (query: string) => void;
-}
 
-export const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
+const PRODUCT_LIST_PATH = "/products";
+
+export const SearchBar: FC = () => {
+  const { setSearchTerm, searchTerm } = useProducts(); 
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (searchTerm === "") {
+        setSearchQuery("");
+    }
+  }, [searchTerm]);
+
+  const updateSearchTerm = (query: string) => {
+    setSearchQuery(query);
+    setSearchTerm(query);
+  };
 
   const handleSearch = () => {
-    if (onSearch) {
-      onSearch(searchQuery);
-    }
+    setSearchTerm(searchQuery); 
+    navigate(PRODUCT_LIST_PATH);
   };
 
   const handleClear = () => {
-    setSearchQuery("");
-    if (onSearch) {
-      onSearch("");
-    }
+    updateSearchTerm("");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      handleSearch();
+      e.preventDefault(); 
+      handleSearch(); 
     }
   };
 
@@ -38,8 +49,8 @@ export const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         placeholder="Search products..."
         className="flex-1"
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyPress={handleKeyPress}
+        onChange={(e) => updateSearchTerm(e.target.value)}
+        onKeyPress={handleKeyPress} 
         inputProps={{
           className: "text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400",
         }}
@@ -54,7 +65,7 @@ export const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         </IconButton>
       )}
       <IconButton
-        onClick={handleSearch}
+        onClick={handleSearch} 
         className="text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
       >
         <SearchIcon />
