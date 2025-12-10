@@ -8,10 +8,9 @@ import { LoginButton } from "../common/LoginButton";
 import { useCart } from "../../context/CartContext";
 
 interface HeaderProps {
-  onSearch?: (query: string) => void;
 }
 
-export const Header: FC<HeaderProps> = ({ onSearch }) => {
+export const Header: FC<HeaderProps> = () => {
   const { darkMode, toggleDarkMode } = useDarkMode();
   const { getCartItemsCount } = useCart();
 
@@ -43,7 +42,7 @@ export const Header: FC<HeaderProps> = ({ onSearch }) => {
 
           {/* Center Section: Search Bar */}
           <div className="flex-1 max-w-md">
-            <SearchBar onSearch={onSearch} />
+            <SearchBar />
           </div>
 
           {/* Right Section: Actions */}

@@ -5,6 +5,7 @@ import { Checkroom, Devices, Kitchen, SportsBasketball } from "@mui/icons-materi
 import { ProductCarousel } from "../../components/features/products/ProductCarousel";
 import { useProducts } from "../../context/ProductContext";
 import { LazyLoadWrapper } from "../../components/common/LazyLoadWrapper";
+import { useEffect } from "react";
 
 export const HomePage = () => {
   const categories = [
@@ -24,7 +25,11 @@ export const HomePage = () => {
     },
   ];
 
-  const { mockProducts } = useProducts();
+  const { mockProducts, setSearchTerm } = useProducts();
+
+  useEffect(() => {
+    setSearchTerm("");
+  }, [setSearchTerm]);
 
   const getRandomProducts = (products: any[], count: number) => {
     const shuffled = [...products].sort(() => 0.5 - Math.random());

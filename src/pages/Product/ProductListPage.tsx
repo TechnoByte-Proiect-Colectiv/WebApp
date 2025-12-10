@@ -17,7 +17,8 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-} from "@mui/material";
+}
+ from "@mui/material";
 import { ProductCard } from "./ProductCard";
 import { useProducts } from "../../context/ProductContext";
 import { ProductType } from "../../types/product/product";
@@ -30,7 +31,7 @@ export const ProductListPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const loader = useRef<HTMLDivElement>(null);
 
-  const { mockProducts } = useProducts();
+  const { mockProducts, searchTerm } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
   const categorySlug = searchParams.get("category");
 
@@ -45,13 +46,23 @@ export const ProductListPage: React.FC = () => {
   }, [categorySlug]);
 
   const filteredProducts = useMemo(() => {
-    if (!categorySlug) {
-      return mockProducts;
+    let results = mockProducts;
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+    if (lowerCaseSearchTerm) {
+      results = results.filter((product) =>
+        product.name.toLowerCase().includes(lowerCaseSearchTerm)
+      );
     }
-    return mockProducts.filter(
-      (product) => product.category.slug === categorySlug
-    );
-  }, [mockProducts, categorySlug]);
+
+    if (categorySlug) {
+      results = results.filter(
+        (product) => product.category.slug === categorySlug
+      );
+    }
+
+    return results;
+  }, [mockProducts, categorySlug, searchTerm]);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSlug = event.target.value;
@@ -177,6 +188,14 @@ export const ProductListPage: React.FC = () => {
           </Box>
 
           <Grid container spacing={2}>
+            {filteredProducts.length === 0 && (
+              <Box sx={{ p: 4, width: '100%', textAlign: 'center' }}>
+                <Typography variant="h6" color="text.secondary">
+                  No products found for your search criteria.
+                </Typography>
+              </Box>
+            )}
+            
             {productsToShow.map((product) => (
               <Grid key={product.id} size={{ xs: 6, sm: 4, md: 4, lg: 3 }}>
                 <ProductCard product={product} />

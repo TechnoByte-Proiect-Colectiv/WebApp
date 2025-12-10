@@ -2,7 +2,7 @@ import { Category } from "./category";
 
 export interface ProductType {
     id: string;
-    name: string;
+    name: string; // cred ca asta ar fi title
     slug: string;
     description: string;
     price: number;
