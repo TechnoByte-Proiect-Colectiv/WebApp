@@ -17,6 +17,7 @@ import { CheckoutPage } from "../pages/Checkout/CheckoutPage";
 import { SellerPage } from "../pages/Seller/SellerPage";
 import { Container } from "@mui/material";
 import { OrderPage } from "../pages/Order/OrderPage";
+import { ResetPasswordPage } from "../pages/Auth/ResetPasswordPage";
 
 // Import Admin Panel components
 import AdminLayout from "../AdminPanel/AdminLayout";
@@ -34,6 +35,8 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.PRODUCT_DETAIL} element={<ProductPage />} />
         <Route path={ROUTES.PRODUCTS} element={<ProductListPage />} />
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+
         <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
         <Route path={ROUTES.SELLER} element={<SellerPage />} />
 
