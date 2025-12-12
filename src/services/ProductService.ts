@@ -13,7 +13,7 @@ export const ProductService = {
 
     // get a product by ID
     getById: async(id: number): Promise<ProductType> => {
-        const response = await fetch(`${API_URL}/products/${id}`);
+        const response = await fetch(`${API_URL}/product/${id}`);
         if(!response.ok) throw new Error('Product not found!');
         return response.json()
     },

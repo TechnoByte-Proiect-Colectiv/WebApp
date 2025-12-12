@@ -7,7 +7,7 @@ export interface ProductType {
     description: string;
     price: number;
     currency: string;
-    stock: number;
+    quantity: number;
     image: string;
     category: Category;
     seller: {

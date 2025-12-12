@@ -29,6 +29,7 @@ import { ProductType } from "../../types/product/product";
 import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
 import { Review } from "../../types/product/review";
+import { ProductService } from "../../services/ProductService";
 
 export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propReviews }) => {
   const { slug } = useParams<{ slug: string }>();
@@ -45,9 +46,15 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
 
   useEffect(() => {
     if (!slug) return;
-    const prod = mockProducts.find((p) => p.slug === slug);
-    setProduct(prod || null);
-    setLoading(false);
+    // const prod = mockProducts.find((p) => p.slug === slug);
+    const prod = ProductService.getById(parseInt(slug));
+    prod.then(
+      (prod) => {
+        setProduct(prod || null);
+        setLoading(false);
+
+      }
+    );
   }, [slug, mockProducts]);
 
   if (loading) return <div>Loading...</div>;
@@ -97,7 +104,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
               {product.name}
             </Typography>
 
-            <Box display="flex" alignItems="center" gap={1} mt={1} mb={2}>
+            {/* <Box display="flex" alignItems="center" gap={1} mt={1} mb={2}>
                 <StorefrontIcon fontSize="small" color="action" />
                 <Typography variant="body2" color="text.secondary">
                     Sold by: {' '}
@@ -109,9 +116,9 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
                         {product.seller.name}
                     </Link>
                 </Typography>
-            </Box>
+            </Box> */}
 
-            <Box display="flex" alignItems="center" gap={0.5}>
+            {/* <Box display="flex" alignItems="center" gap={0.5}>
               <Typography variant="h6" sx={{ color: "#FFD700", fontWeight: 'bold' }}>
                 {displayRating.toFixed(1)}
               </Typography>
@@ -119,7 +126,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
               <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
                 ({reviewCount} reviews)
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
 
           <Divider />
