@@ -87,7 +87,7 @@ export const generateProducts = (count: number): ProductType[] => {
       description: `This is a high-quality ${name} suitable for everyone. Featuring top-notch materials and design.`,
       price: generatePrice(),
       currency: "RON",
-      stock: getRandomInt(0, 50), // 0 stoc = out of stock
+      quantity: getRandomInt(0, 50), // 0 quantity = out of stock
       // Folosim picsum pentru imagini random, cu un seed bazat pe index pentru consistență
       image: `https://picsum.photos/seed/${index + 100}/400/400`, 
       category: category,
@@ -98,6 +98,7 @@ export const generateProducts = (count: number): ProductType[] => {
       specifications: generateSpecs(category.name),
       // Rating între 3.5 și 5.0
       rating: parseFloat((Math.random() * (5.0 - 3.5) + 3.5).toFixed(1)), 
+      fileData: ""
     };
   });
 };

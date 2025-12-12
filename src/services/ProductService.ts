@@ -13,9 +13,13 @@ export const ProductService = {
 
     // get a product by ID
     getById: async(id: number): Promise<ProductType> => {
-        const response = await fetch(`${API_URL}/products/${id}`);
+        const response = await fetch(`${API_URL}/product/${id}`);
         if(!response.ok) throw new Error('Product not found!');
-        return response.json()
+        let p:ProductType;
+        p = await response.json()
+        p.image = "data:image/png;base64," + p.fileData;
+
+        return p;
     },
 
     // get reviews for a product
