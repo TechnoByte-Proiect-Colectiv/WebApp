@@ -38,7 +38,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
 
   const [product, setProduct] = useState<ProductType | null>(null);
   const [reviews, setReviews] = useState<Review[]>(propReviews || []);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [showDescription, setShowDescription] = useState(true);
   const [showSpecs, setShowSpecs] = useState(false);
@@ -47,6 +47,8 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
   useEffect(() => {
     if (!slug) return;
     // const prod = mockProducts.find((p) => p.slug === slug);
+    if(loading) return;
+    setLoading(true);
     const prod = ProductService.getById(parseInt(slug));
     prod.then(
       (prod) => {
@@ -55,7 +57,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
 
       }
     );
-  }, [slug, mockProducts]);
+  }, [slug]);
 
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Product not found</div>;
@@ -137,8 +139,8 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
             </Typography>
             
             <Box display="flex" alignItems="center" gap={1} mt={1}>
-                {product.stock > 0 ? (
-                    <Chip icon={<CheckCircleIcon />} label={`In Stock (${product.stock} units)`} color="success" variant="outlined" />
+                {product.quantity > 0 ? (
+                    <Chip icon={<CheckCircleIcon />} label={`In Stock (${product.quantity} units)`} color="success" variant="outlined" />
                 ) : (
                     <Chip icon={<RemoveCircleIcon />} label="Out of Stock" color="error" variant="outlined" />
                 )}
@@ -155,12 +157,12 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
               }}
               variant={isInCart(product.id) ? "outlined" : "contained"}
               size="large"
-              disabled={product.stock === 0}
+              disabled={product.quantity === 0}
               sx={{ flex: 1 }}
             >
               {isInCart(product.id)
                 ? `In Basket (${getProductQuantity(product.id)})`
-                : product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                : product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
             </Button>
             
             <Button

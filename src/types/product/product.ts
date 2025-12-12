@@ -16,4 +16,5 @@ export interface ProductType {
     };
     specifications: Record<string, string>[];
     rating: number;
+    fileData: string;
   }

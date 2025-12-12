@@ -42,8 +42,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const existingItem = cartProducts.find((item) => item.product.id === product.id);
     const currentQty = existingItem ? existingItem.quantity : 0;
 
-    if (currentQty + quantity > product.stock) {
-      alert(`Can't add more. Maximum stock available: ${product.stock}`);
+    if (currentQty + quantity > product.quantity) {
+      alert(`Can't add more. Maximum quantity available: ${product.quantity}`);
       return; 
     }
 
@@ -80,11 +80,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     
     if (!targetItem) return;
 
-    if (newQuantity > targetItem.product.stock) {
-       alert(`Maximum stock available is ${targetItem.product.stock}`);
+    if (newQuantity > targetItem.product.quantity) {
+       alert(`Maximum stock available is ${targetItem.product.quantity}`);
        setCartProducts((prevProducts) =>
         prevProducts.map((item, i) =>
-          i === index ? { ...item, quantity: targetItem.product.stock } : item
+          i === index ? { ...item, quantity: targetItem.product.quantity } : item
         )
       );
       return;
