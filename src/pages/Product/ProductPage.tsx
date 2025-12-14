@@ -29,6 +29,7 @@ import { ProductType } from "../../types/product/product";
 import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
 import { Review } from "../../types/product/review";
+import { ProductService } from "../../services/ProductService";
 
 export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propReviews }) => {
   const { slug } = useParams<{ slug: string }>();
@@ -37,7 +38,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
 
   const [product, setProduct] = useState<ProductType | null>(null);
   const [reviews, setReviews] = useState<Review[]>(propReviews || []);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [showDescription, setShowDescription] = useState(true);
   const [showSpecs, setShowSpecs] = useState(false);
@@ -45,10 +46,18 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
 
   useEffect(() => {
     if (!slug) return;
-    const prod = mockProducts.find((p) => p.slug === slug);
-    setProduct(prod || null);
-    setLoading(false);
-  }, [slug, mockProducts]);
+    // const prod = mockProducts.find((p) => p.slug === slug);
+    if(loading) return;
+    setLoading(true);
+    const prod = ProductService.getById(parseInt(slug));
+    prod.then(
+      (prod) => {
+        setProduct(prod || null);
+        setLoading(false);
+
+      }
+    );
+  }, [slug]);
 
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Product not found</div>;
@@ -97,7 +106,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
               {product.name}
             </Typography>
 
-            <Box display="flex" alignItems="center" gap={1} mt={1} mb={2}>
+            {/* <Box display="flex" alignItems="center" gap={1} mt={1} mb={2}>
                 <StorefrontIcon fontSize="small" color="action" />
                 <Typography variant="body2" color="text.secondary">
                     Sold by: {' '}
@@ -109,9 +118,9 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
                         {product.seller.name}
                     </Link>
                 </Typography>
-            </Box>
+            </Box> */}
 
-            <Box display="flex" alignItems="center" gap={0.5}>
+            {/* <Box display="flex" alignItems="center" gap={0.5}>
               <Typography variant="h6" sx={{ color: "#FFD700", fontWeight: 'bold' }}>
                 {displayRating.toFixed(1)}
               </Typography>
@@ -119,7 +128,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
               <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
                 ({reviewCount} reviews)
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
 
           <Divider />
@@ -130,8 +139,8 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
             </Typography>
             
             <Box display="flex" alignItems="center" gap={1} mt={1}>
-                {product.stock > 0 ? (
-                    <Chip icon={<CheckCircleIcon />} label={`In Stock (${product.stock} units)`} color="success" variant="outlined" />
+                {product.quantity > 0 ? (
+                    <Chip icon={<CheckCircleIcon />} label={`In Stock (${product.quantity} units)`} color="success" variant="outlined" />
                 ) : (
                     <Chip icon={<RemoveCircleIcon />} label="Out of Stock" color="error" variant="outlined" />
                 )}
@@ -148,12 +157,12 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
               }}
               variant={isInCart(product.id) ? "outlined" : "contained"}
               size="large"
-              disabled={product.stock === 0}
+              disabled={product.quantity === 0}
               sx={{ flex: 1 }}
             >
               {isInCart(product.id)
                 ? `In Basket (${getProductQuantity(product.id)})`
-                : product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                : product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
             </Button>
             
             <Button
