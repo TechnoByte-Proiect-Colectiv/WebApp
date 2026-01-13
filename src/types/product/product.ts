@@ -8,8 +8,9 @@ export interface ProductType {
     price: number;
     currency: string;
     quantity: number;
+    // category: Category;
+    category: string;
     image: string;
-    category: Category;
     seller: {
       name: string;
       slug: string;

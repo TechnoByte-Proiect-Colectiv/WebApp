@@ -17,13 +17,13 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-}
- from "@mui/material";
+} from "@mui/material";
 import { ProductCard } from "./ProductCard";
 import { useProducts } from "../../context/ProductContext";
 import { ProductType } from "../../types/product/product";
 import { useSearchParams } from "react-router-dom";
 import { MOCK_CATEGORIES } from "../../context/mockProducts";
+import { ProductService } from "../../services/ProductService";
 
 export const ProductListPage: React.FC = () => {
   const [productsToShow, setProductsToShow] = useState<ProductType[]>([]);
@@ -31,9 +31,29 @@ export const ProductListPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const loader = useRef<HTMLDivElement>(null);
 
-  const { mockProducts, searchTerm } = useProducts();
+  const { searchTerm } = useProducts();
+
+  const [allProducts, setAllProducts] = useState<ProductType[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const categorySlug = searchParams.get("category");
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const products = await ProductService.getAll();
+        setAllProducts(products);
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   const pageTitle = useMemo(() => {
     if (!categorySlug) {
@@ -46,7 +66,7 @@ export const ProductListPage: React.FC = () => {
   }, [categorySlug]);
 
   const filteredProducts = useMemo(() => {
-    let results = mockProducts;
+    let results = allProducts;
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
     if (lowerCaseSearchTerm) {
@@ -57,12 +77,13 @@ export const ProductListPage: React.FC = () => {
 
     if (categorySlug) {
       results = results.filter(
-        (product) => product.category.slug === categorySlug
+        (product) =>
+          product.category.toUpperCase() === categorySlug.toUpperCase()
       );
     }
 
     return results;
-  }, [mockProducts, categorySlug, searchTerm]);
+  }, [allProducts, categorySlug, searchTerm]);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSlug = event.target.value;
@@ -189,13 +210,13 @@ export const ProductListPage: React.FC = () => {
 
           <Grid container spacing={2}>
             {filteredProducts.length === 0 && (
-              <Box sx={{ p: 4, width: '100%', textAlign: 'center' }}>
+              <Box sx={{ p: 4, width: "100%", textAlign: "center" }}>
                 <Typography variant="h6" color="text.secondary">
                   No products found for your search criteria.
                 </Typography>
               </Box>
             )}
-            
+
             {productsToShow.map((product) => (
               <Grid key={product.id} size={{ xs: 6, sm: 4, md: 4, lg: 3 }}>
                 <ProductCard product={product} />

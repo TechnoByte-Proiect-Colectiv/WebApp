@@ -16,24 +16,23 @@ import {
   TableContainer,
   TableRow,
   Paper,
-  Link
+  Link,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import StorefrontIcon from '@mui/icons-material/Storefront';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
 import { ProductType } from "../../types/product/product";
-import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
 import { Review } from "../../types/product/review";
 import { ProductService } from "../../services/ProductService";
 
-export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propReviews }) => {
+export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
+  reviews: propReviews,
+}) => {
   const { slug } = useParams<{ slug: string }>();
-  const { mockProducts } = useProducts();
   const { getProductQuantity, isInCart, addToCart } = useCart();
 
   const [product, setProduct] = useState<ProductType | null>(null);
@@ -46,17 +45,13 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
 
   useEffect(() => {
     if (!slug) return;
-    // const prod = mockProducts.find((p) => p.slug === slug);
-    if(loading) return;
+    if (loading) return;
     setLoading(true);
-    const prod = ProductService.getById(parseInt(slug));
-    prod.then(
-      (prod) => {
-        setProduct(prod || null);
-        setLoading(false);
-
-      }
-    );
+    const prod = ProductService.getBySlug(slug);
+    prod.then((prod) => {
+      setProduct(prod || null);
+      setLoading(false);
+    });
   }, [slug]);
 
   if (loading) return <div>Loading...</div>;
@@ -80,24 +75,30 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
     : product.rating;
 
-  const reviewCount = reviews.length > 0 ? reviews.length : 0; 
+  const reviewCount = reviews.length > 0 ? reviews.length : 0;
 
   return (
     <Container sx={{ mt: 4, mb: 8 }}>
-      <Card sx={{ p: 2, display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
-        
-        <Box flex="0 0 40%" sx={{ position: 'relative' }}>
-            <img
-              src={product.image}
-              alt={product.name}
-              style={{ width: "100%", borderRadius: 8, objectFit: 'cover' }}
-            />
-            <Chip 
-                label={product.category.name} 
-                color="primary" 
-                size="small" 
-                sx={{ position: 'absolute', top: 10, left: 10 }}
-            />
+      <Card
+        sx={{
+          p: 2,
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 4,
+        }}
+      >
+        <Box flex="0 0 40%" sx={{ position: "relative" }}>
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{ width: "100%", borderRadius: 8, objectFit: "cover" }}
+          />
+          <Chip
+            label={product.category}
+            color="primary"
+            size="small"
+            sx={{ position: "absolute", top: 10, left: 10 }}
+          />
         </Box>
 
         <Box flex="1" display="flex" flexDirection="column" gap={2}>
@@ -137,13 +138,23 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
             <Typography variant="h3" color="primary" fontWeight="medium">
               {product.price.toFixed(2)} {product.currency}
             </Typography>
-            
+
             <Box display="flex" alignItems="center" gap={1} mt={1}>
-                {product.quantity > 0 ? (
-                    <Chip icon={<CheckCircleIcon />} label={`In Stock (${product.quantity} units)`} color="success" variant="outlined" />
-                ) : (
-                    <Chip icon={<RemoveCircleIcon />} label="Out of Stock" color="error" variant="outlined" />
-                )}
+              {product.quantity > 0 ? (
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label={`In Stock (${product.quantity} units)`}
+                  color="success"
+                  variant="outlined"
+                />
+              ) : (
+                <Chip
+                  icon={<RemoveCircleIcon />}
+                  label="Out of Stock"
+                  color="error"
+                  variant="outlined"
+                />
+              )}
             </Box>
           </Box>
 
@@ -162,9 +173,11 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
             >
               {isInCart(product.id)
                 ? `In Basket (${getProductQuantity(product.id)})`
-                : product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
+                : product.quantity === 0
+                ? "Out of Stock"
+                : "Add to Cart"}
             </Button>
-            
+
             <Button
               variant="outlined"
               color="secondary"
@@ -178,57 +191,79 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
       </Card>
 
       <Box mt={4}>
-        
-        <Paper variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
-          <Box 
+        <Paper variant="outlined" sx={{ mb: 2, overflow: "hidden" }}>
+          <Box
             onClick={() => setShowDescription(!showDescription)}
-            sx={{ p: 2, bgcolor: 'neutral.100', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
+            sx={{
+              p: 2,
+              bgcolor: "neutral.100",
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
             <Typography variant="h6">Description</Typography>
             <Typography>{showDescription ? "−" : "+"}</Typography>
           </Box>
           <Collapse in={showDescription}>
             <Box p={3}>
-              <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-                  {product.description}
+              <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+                {product.description}
               </Typography>
             </Box>
           </Collapse>
         </Paper>
 
-        <Paper variant="outlined" sx={{ mb: 2, overflow: 'hidden' }}>
-          <Box 
+        <Paper variant="outlined" sx={{ mb: 2, overflow: "hidden" }}>
+          <Box
             onClick={() => setShowSpecs(!showSpecs)}
-            sx={{ p: 2, bgcolor: 'neutral.100', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
+            sx={{
+              p: 2,
+              bgcolor: "neutral.100",
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
             <Typography variant="h6">Specifications</Typography>
             <Typography>{showSpecs ? "−" : "+"}</Typography>
           </Box>
           <Collapse in={showSpecs}>
-             <TableContainer component={Box}>
-                <Table>
-                    <TableBody>
-                        {product.specifications && product.specifications.map((specItem, index) => {
-                            const [key, value] = Object.entries(specItem)[0];
-                            return (
-                                <TableRow key={index} hover>
-                                    <TableCell component="th" scope="row" sx={{ fontWeight: 'bold', width: '30%' }}>
-                                        {key}
-                                    </TableCell>
-                                    <TableCell>{value}</TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-             </TableContainer>
+            <TableContainer component={Box}>
+              <Table>
+                <TableBody>
+                  {product.specifications &&
+                    product.specifications.map((specItem, index) => {
+                      const [key, value] = Object.entries(specItem)[0];
+                      return (
+                        <TableRow key={index} hover>
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            sx={{ fontWeight: "bold", width: "30%" }}
+                          >
+                            {key}
+                          </TableCell>
+                          <TableCell>{value}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Collapse>
         </Paper>
 
-        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-          <Box 
+        <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+          <Box
             onClick={() => setShowReviews(!showReviews)}
-            sx={{ p: 2, bgcolor: 'neutral.100', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
+            sx={{
+              p: 2,
+              bgcolor: "neutral.100",
+              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
             <Typography variant="h6">Reviews ({reviews.length})</Typography>
             <Typography>{showReviews ? "−" : "+"}</Typography>
@@ -236,18 +271,24 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
           <Collapse in={showReviews}>
             <Box p={2}>
               {reviews.length === 0 && (
-                  <Typography color="text.secondary" align="center" py={2}>
-                      No reviews yet for this product.
-                  </Typography>
+                <Typography color="text.secondary" align="center" py={2}>
+                  No reviews yet for this product.
+                </Typography>
               )}
               {reviews.map((r) => (
                 <Card key={r.id} variant="outlined" sx={{ mb: 2 }}>
                   <CardContent>
                     <Box display="flex" justifyContent="space-between" mb={1}>
-                        <Typography fontWeight="bold">User {r.user_id}</Typography>
-                        <Typography variant="caption" color="text.secondary">{r.created_at}</Typography>
+                      <Typography fontWeight="bold">
+                        User {r.user_id}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {r.created_at}
+                      </Typography>
                     </Box>
-                    <Box display="flex" mb={1}>{renderStars(r.rating)}</Box>
+                    <Box display="flex" mb={1}>
+                      {renderStars(r.rating)}
+                    </Box>
                     <Typography variant="body2">{r.comment}</Typography>
                   </CardContent>
                 </Card>
@@ -255,7 +296,6 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({ reviews: propRev
             </Box>
           </Collapse>
         </Paper>
-
       </Box>
     </Container>
   );
