@@ -1,4 +1,3 @@
-import { Address } from "../types/user/address";
 import { Order } from "../types/user/order";
 import {
   AuthResponse,
@@ -6,454 +5,210 @@ import {
   SignUpCredentials,
   User,
 } from "../types/user/user";
+import apiClient from "./apiClient";
 
 export const mockOrders: Order[] = [
-  {
-    id: "ORD-1001",
-    createdAt: "2025-01-15T10:24:00Z",
-    totalProducts: 320,
-    totalShipping: 25,
-    total: 345,
-    currency: "EUR",
-    paymentMethod: "card",
-    paymentStatus: "paid",
-    orderStatus: "processed",
-    billingAddress: {
-      id: "ADDR-2001",
-      type: "shipping",
-      firstName: "Andrei",
-      lastName: "Popescu",
-      street: "Str. Lalelelor 12",
-      city: "Cluj-Napoca",
-      county: "Cluj",
-      postalCode: "400100",
-      country: "RO",
-      phoneNumber: "+40721234567",
-      isPrimary: true,
-    },
-    shippingAddress: {
-      id: "ADDR-2001",
-      type: "shipping",
-      firstName: "Andrei",
-      lastName: "Popescu",
-      street: "Str. Lalelelor 12",
-      city: "Cluj-Napoca",
-      county: "Cluj",
-      postalCode: "400100",
-      country: "RO",
-      phoneNumber: "+40721234567",
-      isPrimary: true,
-    },
-    shipments: [
-      {
-        sellerId: "SELL-1",
-        sellerName: "TechStore",
-        status: "shipped",
-        shippingCost: 25,
-        shippingCurrency: "EUR",
-        items: [
-          {
-            productId: "PROD-101",
-            productName: "Mouse Wireless Logitech",
-            picture: "/img/products/mouse1.jpg",
-            quantity: 1,
-            unitPrice: 25,
-            currency: "EUR",
-          },
-          {
-            productId: "PROD-102",
-            productName: "Tastatură mecanică HyperX",
-            picture: "/img/products/keyboard1.jpg",
-            quantity: 1,
-            unitPrice: 70,
-            currency: "EUR",
-          },
-        ],
-      },
-      {
-        sellerId: "SELL-2",
-        sellerName: "BobTest",
-        status: "processing",
-        shippingCost: 10,
-        shippingCurrency: "EUR",
-        items: [
-          {
-            productId: "PROD-101",
-            productName: "Mouse Wireless Logitech saj as as as as sa as as s",
-            picture: "/img/products/mouse1.jpg",
-            quantity: 1,
-            unitPrice: 25,
-            currency: "EUR",
-          },
-          {
-            productId: "PROD-102",
-            productName: "Tastatură mecanică HyperX",
-            picture: "/img/products/keyboard1.jpg",
-            quantity: 1,
-            unitPrice: 70,
-            currency: "EUR",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "ORD-1002",
-    createdAt: "2025-02-03T14:58:00Z",
-    totalProducts: 150,
-    totalShipping: 15,
-    total: 165,
-    currency: "EUR",
-    paymentMethod: "paypal",
-    paymentStatus: "pending",
-    orderStatus: "awaiting_payment",
-    shippingAddress: {
-      id: "ADDR-2002",
-      type: "billing",
-      firstName: "Maria",
-      lastName: "Ionescu",
-      street: "Bd. Unirii 45",
-      city: "București",
-      county: "București",
-      postalCode: "030102",
-      country: "RO",
-      phoneNumber: "+40744555666",
-      isPrimary: false,
-    },
-    billingAddress: {
-      id: "ADDR-2002",
-      type: "billing",
-      firstName: "Maria",
-      lastName: "Ionescu",
-      street: "Bd. Unirii 45",
-      city: "București",
-      county: "București",
-      postalCode: "030102",
-      country: "RO",
-      phoneNumber: "+40744555666",
-      isPrimary: false,
-    },
-    shipments: [
-      {
-        sellerId: "SELL-2",
-        sellerName: "FashionPoint",
-        status: "processing",
-        shippingCost: 15,
-        shippingCurrency: "EUR",
-        items: [
-          {
-            productId: "PROD-201",
-            productName: "Geacă de iarnă",
-            picture: "/img/products/jacket1.jpg",
-            quantity: 1,
-            unitPrice: 120,
-            currency: "EUR",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "ORD-1003",
-    createdAt: "2025-02-20T08:11:00Z",
-    totalProducts: 540,
-    totalShipping: 30,
-    total: 570,
-    currency: "EUR",
-    paymentMethod: "card",
-    paymentStatus: "paid",
-    orderStatus: "delivered",
-    shippingAddress: {
-      id: "ADDR-2003",
-      type: "shipping",
-      firstName: "George",
-      lastName: "Marin",
-      street: "Str. Pajiștei 8",
-      city: "Timișoara",
-      county: "Timiș",
-      postalCode: "300200",
-      country: "RO",
-      phoneNumber: "+40732111222",
-      isPrimary: true,
-    },
-    billingAddress: {
-      id: "ADDR-2003",
-      type: "shipping",
-      firstName: "George",
-      lastName: "Marin",
-      street: "Str. Pajiștei 8",
-      city: "Timișoara",
-      county: "Timiș",
-      postalCode: "300200",
-      country: "RO",
-      phoneNumber: "+40732111222",
-      isPrimary: true,
-    },
-    shipments: [
-      {
-        sellerId: "SELL-3",
-        sellerName: "Home&Stuff",
-        status: "delivered",
-        shippingCost: 30,
-        shippingCurrency: "EUR",
-        items: [
-          {
-            productId: "PROD-301",
-            productName: "Aspirator robot Xiaomi",
-            picture: "/img/products/vacuum1.jpg",
-            quantity: 1,
-            unitPrice: 300,
-            currency: "EUR",
-          },
-          {
-            productId: "PROD-302",
-            productName: "Purificator de aer Philips",
-            picture: "/img/products/airpurifier1.jpg",
-            quantity: 1,
-            unitPrice: 240,
-            currency: "EUR",
-          },
-        ],
-      },
-    ],
-  },
+
 ];
 
-const mockAddresses: Address[] = [
-  {
-    id: "addr-1",
-    type: "billing",
-    firstName: "Ion",
-    lastName: "Popescu",
-    street: "Bulevardul Unirii nr. 10, Bl. 5, Sc. A, Ap. 12",
-    city: "București",
-    county: "Sector 3",
-    postalCode: "030000",
-    country: "România",
-    phoneNumber: "+40 722 123 456",
-    isPrimary: true,
-  },
-  {
-    id: "addr-2",
-    type: "shipping",
-    firstName: "Ion Popescu (Birou)",
-    lastName: "",
-    street: "Calea Floreasca 100",
-    city: "București",
-    county: "Sector 1",
-    postalCode: "014444",
-    country: "România",
-    phoneNumber: "+40 722 123 456",
-    isPrimary: false,
-  },
-  {
-    id: "addr-3",
-    type: "shipping",
-    firstName: "Maria",
-    lastName: "Ionescu",
-    street: "Strada Memorandumului 21",
-    city: "Cluj-Napoca",
-    county: "Cluj",
-    postalCode: "400114",
-    country: "România",
-    phoneNumber: "+40 733 987 654",
-    isPrimary: false,
-  },
-];
+const TOKEN_KEY = "authToken";
+const USER_KEY = "currentUser";
 
-const mockUser: User = {
-  id: "user-101",
-  name: "Ion PopescuUser",
-  email: "user@example.com",
-  role: "user",
-  avatar: "https://picsum.photos/200",
-  phone: "+40 722 123 456",
-  createdAt: "2023-01-15T10:00:00Z",
-  addresses: mockAddresses,
-};
-
-const mockSeller: User = {
-  id: "seller-101",
-  name: "Ion PopescuSeller",
-  email: "user@example.com",
-  role: "user",
-  avatar: "https://picsum.photos/200",
-  phone: "+40 722 123 456",
-  createdAt: "2023-01-15T10:00:00Z",
-  addresses: mockAddresses,
-};
-
-const mockAdmin: User = {
-  id: "adm-101",
-  name: "Ion PopescuAdm",
-  email: "user@example.com",
-  role: "user",
-  avatar: "https://picsum.photos/200",
-  phone: "+40 722 123 456",
-  createdAt: "2023-01-15T10:00:00Z",
-  addresses: mockAddresses,
-};
-
-// Mock database
-const mockUsers: Record<string, { password: string; user: User }> = {
-  "user@example.com": {
-    password: "password123",
-    user: mockUser,
-  },
-};
-
-// Mock token storage
 let currentToken: string | null = null;
 let currentUser: User | null = null;
 
+const safeGet = (obj: any, ...keys: string[]) => {
+  return keys.reduce((acc, k) => (acc && acc[k] !== undefined ? acc[k] : null), obj);
+};
+
 export const userService = {
-  /**
-   * Login with email and password
-   * Mock credentials:
-   * - Email: user@example.com, Password: password123
-   * - Email: demo@example.com, Password: demo123
-   */
-
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const res = await apiClient.post("/api/user/login", credentials);
+      const token = res.data.authToken || res.data.token;
 
-    const mockUser = mockUsers[credentials.email];
+      if (!token) {
+        throw new Error("Nu am primit token de la server.");
+      }
 
-    if (!mockUser || mockUser.password !== credentials.password) {
-      throw new Error("Invalid email or password");
+      localStorage.setItem(TOKEN_KEY, token);
+      apiClient.defaults.headers.Authorization = `Bearer ${token}`;
+
+      const profileRes = await apiClient.get(`/api/user/profile?email=${encodeURIComponent(credentials.email)}`);
+      const user = profileRes.data; 
+
+      if (!user) {
+        throw new Error("Login successful, but cannot retrieve user profile.");
+      }
+
+      currentToken = token;
+      currentUser = user;
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+      window.dispatchEvent(new Event("userUpdated"));
+
+      return { token, user };
+    } catch (err: any) {
+      localStorage.removeItem(TOKEN_KEY);
+      console.error('Login failed', err);
+      throw err;
     }
-
-    const token = `token_${Date.now()}_${Math.random()}`;
-    currentToken = token;
-    currentUser = mockUser.user;
-
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("currentUser", JSON.stringify(mockUser.user));
-
-    return {
-      user: mockUser.user,
-      token,
-    };
   },
 
-  /**
-   * Sign up with new user credentials
-   */
   async signup(credentials: SignUpCredentials): Promise<AuthResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      let res;
+      try {
+        res = await apiClient.post("/api/user/signUp", credentials);
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          res = await apiClient.post("/api/user/signup", credentials);
+        } else {
+          throw err;
+        }
+      }
 
-    if (!credentials.name || !credentials.email || !credentials.password) {
-      throw new Error("All fields are required");
+      const token = res.data.authToken || res.data.token || (res.data.data && (res.data.data.authToken || res.data.data.token));
+      const user = res.data.user || res.data;
+
+      if (!user) {
+        throw new Error("Invalid response from server");
+      }
+
+      if (token) {
+        currentToken = token;
+        localStorage.setItem(TOKEN_KEY, token);
+        apiClient.defaults.headers.Authorization = `Bearer ${token}`;
+      }
+
+      if (!user.name && (user.firstName || user.lastName)) {
+        user.name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+      }
+
+      currentUser = user;
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+      window.dispatchEvent(new Event("userUpdated"));
+
+      return { token: token || "", user };
+    } catch (err: any) {
+      const url = err?.config?.url || "unknown";
+      const status = err?.response?.status;
+      const serverMsg = err?.response?.data?.message || err?.response?.data || err.message;
+      console.error("Signup failed", { url, status, serverMsg });
+      throw new Error(`Signup failed: ${serverMsg} (url: ${url}, status: ${status})`);
     }
-
-    if (credentials.password !== credentials.confirmPassword) {
-      throw new Error("Passwords do not match");
-    }
-
-    if (credentials.password.length < 6) {
-      throw new Error("Password must be at least 6 characters");
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.email)) {
-      throw new Error("Invalid email format");
-    }
-
-    if (mockUsers[credentials.email]) {
-      throw new Error("Email already registered");
-    }
-
-    const newUser: User = {
-      id: `user_${Date.now()}`,
-      name: credentials.name,
-      email: credentials.email,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`,
-      createdAt: new Date().toISOString(),
-      role: "user",
-      addresses: [],
-    };
-
-    mockUsers[credentials.email] = {
-      password: credentials.password,
-      user: newUser,
-    };
-
-    const token = `token_${Date.now()}_${Math.random()}`;
-    currentToken = token;
-    currentUser = newUser;
-
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-    return {
-      user: newUser,
-      token,
-    };
   },
 
-
-  /**
-   * Send reset password email to user
-   * @param email email string coresponding to the user
-   */
   async resetPassword(email: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const mockUser = mockUsers[email];
-
-    if (!mockUser) {
-      throw new Error("No user with specified email");
-    }
-    
+    // POST /api/user/forgot { email }
+    await apiClient.post("/api/user/forgot", { email });
   },
 
+  async changePassword(payload: { id: string; password: string; firstName?: string; lastName?: string; email?: string }): Promise<void> {
+    try {
+      const res = await apiClient.put("/api/user/changePassword", payload);
+      // Optionally return server message
+      return safeGet(res, "data", "data") || safeGet(res, "data");
+    } catch (err: any) {
+      if (err?.request && !err?.response) {
+        const url = err?.config?.url || "/api/user/changePassword";
+        console.error("Network/CORS error when calling changePassword", { url, err });
+        throw new Error(`Network Error: no response from server for PUT ${url}. Check backend is running, REACT_APP_API_URL/proxy, and server CORS (preflight) settings. (${err.message})`);
+      }
 
-
-  async updateUser(updatedData: Partial<User>): Promise<User> {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    if (!currentUser) {
-      throw new Error("Niciun utilizator nu este autentificat.");
+      const url = err?.config?.url || "/api/user/changePassword";
+      const status = err?.response?.status;
+      const serverMsg = err?.response?.data?.message || err?.response?.data || err.message;
+      console.error("Change password failed", { url, status, serverMsg });
+      throw new Error(`Change password failed: ${serverMsg} (url: ${url}, status: ${status})`);
     }
-
-    const updatedUser = { ...currentUser, ...updatedData };
-
-    if (mockUsers[updatedUser.email]) {
-      mockUsers[updatedUser.email].user = updatedUser;
-    }
-
-    currentUser = updatedUser;
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-
-    window.dispatchEvent(new Event("userUpdated"));
-
-    return updatedUser;
   },
 
-  /**
-   * Logout the current user
-   */
+  async getUsers(): Promise<User[]> {
+    const res = await apiClient.get("/api/user/users");
+    return safeGet(res, "data", "data") || safeGet(res, "data") || [];
+  },
+
+  async getProfile(email?: string): Promise<User> {
+    const url = email ? `/api/user/profile?email=${encodeURIComponent(email)}` : `/api/user/profile`;
+    const res = await apiClient.get(url);
+    return safeGet(res, "data", "data") || safeGet(res, "data");
+  },
+
+  async deleteUser(id: string): Promise<void> {
+    await apiClient.delete(`/api/user/${encodeURIComponent(id)}`);
+  },
+
+  async updateUser(updatedData: Partial<User> & { id?: string }): Promise<User> {
+    // PUT /api/user/{id} - if id is not provided, use current user id
+    const id = updatedData.id || currentUser?.id;
+    if (!id) throw new Error("No user id provided");
+
+    try {
+      const res = await apiClient.put(`/api/user/${encodeURIComponent(id)}`, updatedData);
+
+      const updatedUser = safeGet(res, "data", "data") || safeGet(res, "data");
+
+      if (updatedUser) {
+        // normalize name if needed
+        if (!updatedUser.name && ((updatedUser as any).firstName || (updatedUser as any).lastName)) {
+          const f = (updatedUser as any).firstName || "";
+          const l = (updatedUser as any).lastName || "";
+          (updatedUser as any).name = `${f} ${l}`.trim();
+        }
+
+        currentUser = updatedUser;
+        localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+        window.dispatchEvent(new Event("userUpdated"));
+        return updatedUser;
+      }
+
+      throw new Error(`Failed to update user: server responded with status ${res?.status}`);
+    } catch (err: any) {
+      // No response received (network error / CORS / backend unreachable)
+      if (err?.request && !err?.response) {
+        const url = err?.config?.url || `/api/user/${encodeURIComponent(id)}`;
+        console.error("Network/CORS error when calling updateUser", { url, err });
+        throw new Error(
+          `Network Error: no response from server for PUT ${url}. Check backend is running, REACT_APP_API_URL/proxy, and server CORS (preflight) settings. (${err.message})`
+        );
+      }
+
+      const url = err?.config?.url || `/api/user/${encodeURIComponent(id)}`;
+      const status = err?.response?.status;
+      const serverMsg = err?.response?.data?.message || err?.response?.data || err.message;
+      console.error("Update user failed", { url, status, serverMsg });
+      throw new Error(`Update failed: ${serverMsg} (url: ${url}, status: ${status})`);
+    }
+  },
+
   async logout(): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    // try server-side logout if available
+    try {
+      await apiClient.post("/api/user/logout");
+    } catch (e) {
+      // ignore if endpoint doesn't exist
+    }
 
     currentToken = null;
     currentUser = null;
 
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+
+    window.dispatchEvent(new Event("userLoggedOut"));
   },
 
-  /**
-   * Get the current authenticated user
-   */
   getCurrentUser(): User | null {
     if (currentUser) return currentUser;
 
-    const storedUser = localStorage.getItem("currentUser");
+    const storedUser = localStorage.getItem(USER_KEY);
     if (storedUser) {
       try {
         currentUser = JSON.parse(storedUser);
         return currentUser;
-      } catch {
+      } catch (e) {
         return null;
       }
     }
@@ -461,31 +216,20 @@ export const userService = {
     return null;
   },
 
-  /**
-   * Get the current auth token
-   */
   getToken(): string | null {
     if (currentToken) return currentToken;
-
-    const storedToken = localStorage.getItem("authToken");
+    const storedToken = localStorage.getItem(TOKEN_KEY);
     if (storedToken) {
       currentToken = storedToken;
       return storedToken;
     }
-
     return null;
   },
 
-  /**
-   * Check if user is authenticated
-   */
   isAuthenticated(): boolean {
     return !!this.getToken();
   },
 
-  /**
-   * Get mock credentials for demo
-   */
   getMockCredentials() {
     return [
       { email: "user@example.com", password: "password123" },

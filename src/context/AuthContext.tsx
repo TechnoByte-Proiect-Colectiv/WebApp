@@ -1,19 +1,22 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { userService } from "../services/userService";
-import { User } from "../types/user/user";
+import { User, LoginCredentials } from "../types/user/user";
 
 interface AuthContextType {
-    token: string | null;
+  token: string | null;
+  user: User | null;
   isAuthenticated: boolean;
   login: (newToken: string) => void;
-  logout: () => void;
+  loginWithCredentials: (creds: LoginCredentials) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>({
   token: null,
+  user: null,
   login: () => {},
-  logout: () => {},
+  loginWithCredentials: async () => {},
+  logout: async () => {},
   isAuthenticated: false,
 });
 
@@ -22,43 +25,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(localStorage.getItem("authToken"));
+  const [token, setToken] = useState<string | null>(userService.getToken());
 
-    useEffect(() => {
-      const storedToken = localStorage.getItem("authToken");
-      if (storedToken) {
-        setToken(storedToken);
-      }
-    }, []);
-
-  // Initialize auth state from userService
   useEffect(() => {
+    const storedToken = userService.getToken();
+    if (storedToken) {
+      setToken(storedToken);
+    }
+
     const storedUser = userService.getCurrentUser();
-    const isAuth = userService.isAuthenticated();
-    if (isAuth && storedUser) {
-      setIsAuthenticated(true);
+    if (storedUser) {
       setUser(storedUser);
+      setIsAuthenticated(true);
     }
   }, []);
 
   const login = (newToken: string) => {
     setToken(newToken);
     localStorage.setItem("authToken", newToken);
+    const storedUser = userService.getCurrentUser();
+    if (storedUser) {
+      setUser(storedUser);
+      setIsAuthenticated(true);
+    }
   };
 
-  const logout = () => {
+  const loginWithCredentials = async (creds: LoginCredentials) => {
+    const { token: t, user: u } = await userService.login(creds);
+    setToken(t);
+    setUser(u);
+    setIsAuthenticated(true);
+  };
+
+  const logout = async () => {
+    await userService.logout();
     setToken(null);
-    localStorage.removeItem("authToken");
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   const contextValue = useMemo(
     () => ({
       token,
+      user,
       login,
+      loginWithCredentials,
       logout,
-      isAuthenticated: !!token,
+      isAuthenticated,
     }),
-    [token]
+    [token, user, isAuthenticated]
   );
 
   return (
@@ -69,9 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-      throw new Error('useAuth should be used inside an AuthProvider');
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth should be used inside an AuthProvider");
   }
+  return context;
+};

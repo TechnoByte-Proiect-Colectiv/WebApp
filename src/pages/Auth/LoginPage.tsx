@@ -12,12 +12,11 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { userService } from "../../services/userService";
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useAuth();
+  const { loginWithCredentials, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState("user@example.com");
   const [password, setPassword] = useState("password123");
@@ -36,11 +35,10 @@ export const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const { token } = await userService.login({ email, password });
-      login(token);
+      await loginWithCredentials({ email, password });
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err.message || "A apărut o eroare.");
+      setError(err?.response?.data?.message || err.message || "A apărut o eroare.");
     } finally {
       setIsLoading(false);
     }
