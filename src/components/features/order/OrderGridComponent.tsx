@@ -32,6 +32,7 @@ export const OrderGridComponent: React.FC<OrderGridCoponentProps> = ({
             id={a.id}
             createdAt={a.createdAt}
             total={a.total}
+            photos={a.photos}
             currency={a.currency}
           ></OrderSummaryCard>
         </Grid>

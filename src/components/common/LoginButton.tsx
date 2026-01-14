@@ -63,7 +63,7 @@ export const LoginButton: FC = () => {
   // Sign up form state
   const [signupFirstName, setSignupFirstName] = useState("");
   const [signupLastName, setSignupLastName] = useState("");
-  const [signupAddress, setSignupAddress] = useState("");
+  // const [signupAddress, setSignupAddress] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
@@ -120,7 +120,7 @@ export const LoginButton: FC = () => {
     setLoginPassword("");
     setSignupFirstName("");
     setSignupLastName("");
-    setSignupAddress("");
+    // setSignupAddress("");
     setSignupEmail("");
     setSignupPassword("");
     setSignupConfirmPassword("");
@@ -156,7 +156,9 @@ export const LoginButton: FC = () => {
     setLoading(true);
 
     try {
-      if (!signupFirstName || !signupLastName || !signupAddress || !signupEmail || !signupPassword || !signupConfirmPassword) {
+      if (!signupFirstName || !signupLastName || 
+        // !signupAddress || 
+        !signupEmail || !signupPassword || !signupConfirmPassword) {
         setError("Please fill in all fields");
         setLoading(false);
         return;
@@ -165,7 +167,7 @@ export const LoginButton: FC = () => {
       const { token } = await userService.signup({
         firstName: signupFirstName,
         lastName: signupLastName,
-        address: signupAddress,
+        // address: signupAddress,
         email: signupEmail,
         password: signupPassword,
         confirmPassword: signupConfirmPassword,
@@ -378,7 +380,7 @@ export const LoginButton: FC = () => {
                 />
               </div>
 
-              <TextField
+              {/* <TextField
                 fullWidth
                 label="Address"
                 value={signupAddress}
@@ -393,7 +395,7 @@ export const LoginButton: FC = () => {
                 InputProps={{
                   className: "dark:text-neutral-100",
                 }}
-              />
+              /> */}
 
               <TextField
                 fullWidth

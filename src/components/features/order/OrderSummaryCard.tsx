@@ -24,13 +24,7 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   id,
   createdAt,
   total,
-  photos = [
-    "https://images.dog.ceo/breeds/mix/xeshaBelka_(1).jpg",
-    "https://images.dog.ceo/breeds/mix/xeshaBelka_(1).jpg",
-    "https://images.dog.ceo/breeds/mix/xeshaBelka_(1).jpg",
-    "https://images.dog.ceo/breeds/mix/xeshaBelka_(1).jpg",
-    "https://images.dog.ceo/breeds/mix/xeshaBelka_(1).jpg",
-  ],
+  photos,
   currency,
 }) => {
   const navigate = useNavigate();

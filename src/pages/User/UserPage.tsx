@@ -19,6 +19,8 @@ import { AddressManager } from "../../components/common/AddressManager";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import { OrderSummaryCardProps } from "../../components/features/order/OrderSummaryCard";
 import { OrderGridComponent } from "../../components/features/order/OrderGridComponent";
+import { useAddressManagement } from "../../hooks/useAddressManagement";
+import { AddressFormDialog } from "../../components/common/AddressFormDialog";
 
 const roleType = {
   user: "Client",
@@ -33,6 +35,19 @@ export const UserPage: React.FC = () => {
   const returns: [] = [];
   const warranties: [] = [];
 
+  const {
+    addresses: userAddresses,
+    setAddressList,
+    isModalOpen,
+    editingAddress,
+    editingId,
+    openAddModal,
+    openEditModal,
+    closeModal,
+    saveAddress,
+    deleteAddress,
+  } = useAddressManagement([]);
+
   const [openOrders, setOpenOrders] = useState(false);
   const [openReviews, setOpenReviews] = useState(false);
   const [openReturns, setOpenReturns] = useState(false);
@@ -40,7 +55,6 @@ export const UserPage: React.FC = () => {
   const [openAbout, setOpenAbout] = useState(false);
   const [openAddresses, setOpenAddresses] = useState(false);
 
-  const [addresses, setAddresses] = useState<Address[]>(user?.addresses || []);
   const [about, setAbout] = useState<string>("No information provided.");
   const [orders, setOrders] = useState<OrderSummaryCardProps[]>([]);
 
@@ -49,10 +63,15 @@ export const UserPage: React.FC = () => {
   const { logout } = useAuth();
 
   useEffect(() => {
-    //fetch userAddresses
-    if (user && user.addresses) {
-      setAddresses(user.addresses);
-    }
+    const fetch = async () => {
+      try {
+        const list = await userService.getUserAddresses();
+        setAddressList(list);
+      } catch (e) {
+        /* fallback  */
+      }
+    };
+    fetch();
 
     if (user && user.createdAt) {
       const aboutStr =
@@ -65,37 +84,37 @@ export const UserPage: React.FC = () => {
 
     //fetch userOrders
 
-    const newOrders: OrderSummaryCardProps[] = [];
-    for (var order of mockOrders) {
-      const modifiedOrder: OrderSummaryCardProps = {
-        id: order.id,
-        createdAt: order.createdAt,
-        total: order.total,
-        currency: order.currency,
-      };
-      newOrders.push(modifiedOrder);
-    }
-    setOrders(newOrders);
+    const fetchOrders = async () => {
+      try {
+        const data = await userService.getMyOrders();
 
-    //fetch userReviews
+        const mappedOrders: OrderSummaryCardProps[] = data.map((o: any) => ({
+          id: o.id.toString(),
+          createdAt: new Date(o.createdAt).toLocaleDateString("ro-RO"), 
+          total: o.total,
+          currency: o.currency || "RON",
+          photos:
+            o.previewImages && o.previewImages.length > 0
+              ? o.previewImages
+              : undefined, 
+        }));
+
+        console.log(mappedOrders)
+
+        setOrders(mappedOrders);
+      } catch (e) {
+        console.error("Failed to fetch orders", e);
+      }
+    };
+    fetchOrders();
   }, [user]);
 
   if (!user) {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 
-  const handleAddAddress = () => {
-    alert("TODO: Add Address");
-  };
-
-  const handleEditAddress = (addr: Address) => {
-    console.log("Edit address", addr);
-  };
-
-  const handleDeleteAddress = (id: string) => {
-    if (window.confirm("Are you sure you want to delete?")) {
-      setAddresses((prev) => prev.filter((a) => a.id !== id));
-    }
+  const handleToggleAddresses = () => {
+    setOpenAddresses(!openAddresses);
   };
 
   return (
@@ -152,13 +171,12 @@ export const UserPage: React.FC = () => {
               color="secondary"
               onClick={async (e) => {
                 e.stopPropagation();
-                // navigate to home first to avoid ProtectedRoute redirecting to login
                 navigate(ROUTES.HOME, { replace: true });
                 try {
                   await userService.logout();
                   await logout();
                 } catch (err) {
-                  console.error('logout error', err);
+                  console.error("logout error", err);
                 }
               }}
             >
@@ -172,7 +190,7 @@ export const UserPage: React.FC = () => {
       <Box mt={4} width="100%">
         <Box mb={2} sx={{ borderTop: "1px solid #ccc", pt: 1 }}>
           <Button
-            onClick={() => setOpenAddresses((prev) => !prev)}
+            onClick={handleToggleAddresses}
             variant="text"
             sx={{ textTransform: "none", fontWeight: "bold" }}
           >
@@ -181,10 +199,10 @@ export const UserPage: React.FC = () => {
           <Collapse in={openAddresses}>
             <Box sx={{ mt: 2, mb: 2 }}>
               <AddressManager
-                addresses={addresses}
-                onAddAddress={handleAddAddress}
-                onEditAddress={handleEditAddress}
-                onDeleteAddress={handleDeleteAddress}
+                addresses={userAddresses}
+                onAddAddress={openAddModal}
+                onEditAddress={openEditModal}
+                onDeleteAddress={deleteAddress}
                 onSelectAddress={() => {}}
                 selectedAddressId=""
                 allowSelection={false}
@@ -200,7 +218,8 @@ export const UserPage: React.FC = () => {
             sx={{ textTransform: "none", fontWeight: "bold" }}
           >
             {openOrders ? "-" : "+"}{" "}
-            {user.role === "user" ? "My Orders" : "Received Orders"}
+            {/* {user.role === "user" ? "My Orders" : "Received Orders"} */}
+            My Orders
           </Button>
           <Collapse in={openOrders}>
             <Box mt={1} display="flex" flexDirection="column" gap={1}>
@@ -349,6 +368,14 @@ export const UserPage: React.FC = () => {
           </Collapse>
         </Box>
       </Box>
+
+      <AddressFormDialog
+        open={isModalOpen}
+        onClose={closeModal}
+        onSave={saveAddress}
+        initialData={editingAddress}
+        title={editingId ? "Edit Address" : "Add New Address"}
+      />
     </Container>
   );
 };
