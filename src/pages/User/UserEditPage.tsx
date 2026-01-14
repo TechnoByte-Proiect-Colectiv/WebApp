@@ -24,7 +24,7 @@ export const UserEditPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [address, setAddress] = useState("");
+  // const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
 
@@ -51,12 +51,12 @@ export const UserEditPage: React.FC = () => {
       setEmail(currentUser.email);
       setAvatar(currentUser.avatar || null);
 
-      if ((currentUser as any).address) {
-        setAddress((currentUser as any).address || "");
-      } else if (currentUser.addresses && currentUser.addresses.length > 0) {
-        const a = currentUser.addresses[0];
-        setAddress(`${a.street}, ${a.city}, ${a.country}`);
-      }
+      // if ((currentUser as any).address) {
+        // setAddress((currentUser as any).address || "");
+      // } else if (currentUser.addresses && currentUser.addresses.length > 0) {
+        // const a = currentUser.addresses[0];
+        // setAddress(`${a.street}, ${a.city}, ${a.country}`);
+      // }
     }
   }, []);
 
@@ -102,7 +102,7 @@ export const UserEditPage: React.FC = () => {
       const updatedData: Partial<User> = {
         firstName,
         lastName,
-        address: address || undefined,
+        // address: address || undefined,
         email,
         avatar: avatar || undefined,
       };
@@ -215,13 +215,13 @@ export const UserEditPage: React.FC = () => {
             />
           </div>
 
-          <TextField
+          {/* <TextField
             label="Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             fullWidth
             disabled={isLoading}
-          />
+          /> */}
 
           <TextField
             label="Email"

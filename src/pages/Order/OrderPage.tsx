@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { generatePath, ROUTES } from "../../routes/routePaths";
 import { Order } from "../../types/user/order";
-import { mockOrders } from "../../services/userService";
+import { mockOrders, userService } from "../../services/userService";
 import {
+  Alert,
   Avatar,
   Box,
   Card,
   CardContent,
   CardHeader,
   Chip,
+  CircularProgress,
   Container,
   Divider,
   Grid,
@@ -21,7 +23,9 @@ export const OrderPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [order, setOrder] = useState<Order>();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const handleClickSeller = (sellerId: string) => {
     //HERE CALL API TO GET ITS SLUG.
@@ -29,27 +33,52 @@ export const OrderPage: React.FC = () => {
     navigate(generatePath.seller(sellerId));
   };
 
-  const handleProductClick = (productId: string) => {
-    //HERE CALL API TO GET ITS SLUG.
-    //NOT BY ID!
-    navigate(generatePath.productDetail(productId));
+  const handleProductClick = (slug: string) => {
+    navigate(generatePath.productDetail(slug));
   };
 
   useEffect(() => {
-    //nu stiu cat de best practice e,
-    //dar cand accesez compnenta, verific (in backend)
-    //daca id-ul acestei comenzi "apartine"
-    //userului curent (jwt) si daca apartine,
-    //afisez primesc datele comenzii din backend si le afisez
+    if (!id) return;
 
-    //altfel redirectionez catre forbidden
+    const fetchOrderData = async () => {
+      setLoading(true);
+      try {
+        const data = await userService.getOrderById(id);
 
-    //promise -> next: incarc order, error: pa
+        setOrder(data);
+        setError(null);
+      } catch (err: any) {
+        console.error("Failed to fetch order:", err);
+        setError("Could not load order details.");
 
-    //navigate(ROUTES.FORBIDDEN)
+        if (err.message && err.message.includes("permission")) {
+          navigate(ROUTES.HOME); // Fallback
+        } else if (err.message && err.message.includes("not found")) {
+          navigate(ROUTES.HOME);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setOrder(mockOrders.find((o) => o.id === id));
-  }, []);
+    fetchOrderData();
+  }, [id, navigate]);
+
+  if (loading) {
+    return (
+      <Container sx={{ mt: 10, display: "flex", justifyContent: "center" }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <Container sx={{ mt: 10 }}>
+        <Alert severity="error">{error || "Order not found."}</Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container
@@ -86,13 +115,15 @@ export const OrderPage: React.FC = () => {
               sx={{
                 p: 2,
                 border: "1px dashed #ccc",
-                borderRadius: 1
+                borderRadius: 1,
               }}
             >
               <Typography fontSize={20}>Billing Address</Typography>
-              <Typography sx={{
-                mt: 1
-              }}>
+              <Typography
+                sx={{
+                  mt: 1,
+                }}
+              >
                 {order?.billingAddress.firstName}{" "}
                 {order?.billingAddress.lastName}{" "}
               </Typography>
@@ -121,13 +152,15 @@ export const OrderPage: React.FC = () => {
               sx={{
                 p: 2,
                 border: "1px dashed #ccc",
-                borderRadius: 1
+                borderRadius: 1,
               }}
             >
               <Typography fontSize={20}>Shipping Address</Typography>
-              <Typography sx={{
-                mt: 1
-              }}>
+              <Typography
+                sx={{
+                  mt: 1,
+                }}
+              >
                 {order?.shippingAddress.firstName}{" "}
                 {order?.shippingAddress.lastName}{" "}
               </Typography>
@@ -155,7 +188,7 @@ export const OrderPage: React.FC = () => {
             >
               <CardContent>
                 <Typography fontSize={20}>Shipment {index + 1}</Typography>
-                <Typography fontSize={14} className="flex items-center gap-1">
+                {/* <Typography fontSize={14} className="flex items-center gap-1">
                   Sold & Delivered by:
                   <button
                     type="button"
@@ -164,7 +197,7 @@ export const OrderPage: React.FC = () => {
                   >
                     {shipment.sellerName}
                   </button>
-                </Typography>
+                </Typography> */}
 
                 {/* itereaza peste produse */}
                 {shipment.items.map((item, index) => (
@@ -177,7 +210,7 @@ export const OrderPage: React.FC = () => {
                     }}
                   >
                     <Box
-                      onClick={() => handleProductClick(item.productId)}
+                      // onClick={() => handleProductClick(item.productId)}
                       sx={{
                         width: "75%",
                         display: "flex",

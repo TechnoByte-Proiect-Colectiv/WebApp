@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { HomePage } from "../pages/Home/HomePage";
 import { ForbiddenPage } from "../pages/NotFound/ForbiddenPage";
 import ProtectedRoute from "./ProtectedRoute";
-import { TestingDashboardPage } from "../pages/TestingComponents/TestingPrivatePage";
 import { NotFoundPage } from "../pages/NotFound/NotFoundPage";
 import { Layout } from "../components/layout/Layout";
 import { ROUTES } from "./routePaths";
@@ -15,7 +14,6 @@ import { LoginPage } from "../pages/Auth/LoginPage";
 import { UserPage } from "../pages/User/UserPage";
 import { CheckoutPage } from "../pages/Checkout/CheckoutPage";
 import { SellerPage } from "../pages/Seller/SellerPage";
-import { Container } from "@mui/material";
 import { OrderPage } from "../pages/Order/OrderPage";
 import { ResetPasswordPage } from "../pages/Auth/ResetPasswordPage";
 
@@ -37,7 +35,6 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
 
-        <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
         <Route path={ROUTES.SELLER} element={<SellerPage />} />
 
         <Route path={ROUTES.FORBIDDEN} element={<ForbiddenPage />} />
@@ -45,6 +42,7 @@ export const AppRoutes: React.FC = () => {
         {/* --- Private rotues --- */}
         <Route element={<ProtectedRoute />}>
           <Route path={ROUTES.SETTINGS} element={<UserEditPage />} />
+          <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
           <Route path={ROUTES.ACCOUNT} element={<UserPage />} />
           <Route path={ROUTES.ORDER} element={<OrderPage />} />
         </Route>

@@ -22,6 +22,9 @@ import { userService } from "../../services/userService";
 import { ROUTES } from "../../routes/routePaths";
 import { Address } from "../../types/user/address";
 import { AddressManager } from "../../components/common/AddressManager";
+import { AddCircleOutline } from "@mui/icons-material";
+import { useAddressManagement } from "../../hooks/useAddressManagement";
+import { AddressFormDialog } from "../../components/common/AddressFormDialog";
 
 interface AddressData {
   fullName: string;
@@ -44,7 +47,6 @@ export const CheckoutPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const [userAddresses, setUserAddresses] = useState<Address[]>([]);
   const [selectedBillingId, setSelectedBillingId] = useState<string>("");
   const [selectedShippingId, setSelectedShippingId] = useState<string>("");
   const [sameAsBilling, setSameAsBilling] = useState(true);
@@ -54,11 +56,23 @@ export const CheckoutPage: React.FC = () => {
   const [shippingData, setShippingData] =
     useState<AddressData>(initialAddressState);
 
+  const {
+    addresses: userAddresses,
+    setAddressList,
+    isModalOpen,
+    editingAddress,
+    editingId,
+    openAddModal,
+    openEditModal,
+    closeModal,
+    saveAddress,
+    deleteAddress,
+  } = useAddressManagement([]);
+
   useEffect(() => {
     if (isAuthenticated) {
       const currentUser = userService.getCurrentUser();
       if (currentUser) {
-        if (currentUser.addresses) setUserAddresses(currentUser.addresses);
         setContactInfo({ email: currentUser.email || "" });
         setBillingData((prev) => ({
           ...prev,
@@ -66,6 +80,16 @@ export const CheckoutPage: React.FC = () => {
           phone: currentUser.phone || "",
         }));
       }
+
+      const fetch = async () => {
+        try {
+          const list = await userService.getUserAddresses();
+          setAddressList(list); 
+        } catch (e) {
+          /* fallback logic */
+        }
+      };
+      fetch();
     }
   }, [isAuthenticated]);
 
@@ -131,7 +155,7 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const finalShippingData = sameAsBilling ? billingData : shippingData;
     const orderData = {
@@ -144,12 +168,19 @@ export const CheckoutPage: React.FC = () => {
         price: item.product.price,
       })),
       total: getCartTotal(),
-      date: new Date().toISOString(),
     };
-    console.log("Order Placed:", orderData);
-    alert("Order placed successfully!");
-    clearCart();
-    navigate(ROUTES.HOME);
+    try {
+      // console.log("Sending Order:", orderData);
+
+      await userService.placeOrder(orderData);
+
+      alert("Order placed successfully!");
+      clearCart();
+      navigate(ROUTES.HOME);
+    } catch (error) {
+      console.error("Order failed:", error);
+      alert("Failed to place order. Please try again.");
+    }
   };
 
   const total = getCartTotal();
@@ -270,6 +301,26 @@ export const CheckoutPage: React.FC = () => {
                   </Alert>
                 )}
 
+                {isAuthenticated && userAddresses.length === 0 && (
+                  <Alert
+                    severity="info"
+                    sx={{ mb: 3 }}
+                    action={
+                      <Button
+                        color="inherit"
+                        size="small"
+                        startIcon={<AddCircleOutline />}
+                        onClick={() => navigate("/account")}
+                      >
+                        Add Address
+                      </Button>
+                    }
+                  >
+                    You don't have any saved addresses yet. Add one to your
+                    profile for faster checkout next time!
+                  </Alert>
+                )}
+
                 {isAuthenticated && userAddresses.length > 0 && (
                   <Box mb={3}>
                     <Typography variant="body2" color="text.secondary" mb={1}>
@@ -280,9 +331,9 @@ export const CheckoutPage: React.FC = () => {
                       selectedAddressId={selectedBillingId}
                       onSelectAddress={handleBillingSelect}
                       allowSelection={true}
-                      onAddAddress={() => {}}
-                      onEditAddress={() => {}}
-                      onDeleteAddress={() => {}}
+                      onAddAddress={openAddModal}
+                      onEditAddress={openEditModal}
+                      onDeleteAddress={deleteAddress}
                     />
                     <Divider sx={{ my: 2 }} />
                   </Box>
@@ -412,6 +463,14 @@ export const CheckoutPage: React.FC = () => {
           </Grid>
         </Grid>
       )}
+
+      <AddressFormDialog
+        open={isModalOpen}
+        onClose={closeModal}
+        onSave={saveAddress}
+        initialData={editingAddress}
+        title={editingId ? "Edit Address" : "Add New Address"}
+      />
     </Container>
   );
 };

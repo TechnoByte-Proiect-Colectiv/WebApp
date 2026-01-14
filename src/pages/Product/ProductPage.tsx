@@ -141,7 +141,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
                 variant="h6"
                 sx={{ color: "#FFD700", fontWeight: "bold" }}
               >
-                {displayRating.toFixed(1)}
+                {displayRating && displayRating.toFixed(1)}
               </Typography>
               <Box display="flex">{renderStars(Math.round(displayRating))}</Box>
               <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
@@ -154,7 +154,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
 
           <Box>
             <Typography variant="h3" color="primary" fontWeight="medium">
-              {product.price.toFixed(2)} {product.currency}
+              {product.price && product.price.toFixed(2)} {product.currency}
             </Typography>
 
             <Box display="flex" alignItems="center" gap={1} mt={1}>

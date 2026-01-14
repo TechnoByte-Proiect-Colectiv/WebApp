@@ -1,3 +1,4 @@
+import { Address } from "../types/user/address";
 import { Order } from "../types/user/order";
 import {
   AuthResponse,
@@ -125,6 +126,77 @@ export const userService = {
     }
   },
 
+  getUserAddresses: async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) throw new Error("No token found");
+
+    const response = await fetch("http://localhost:8080/api/user/address", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch addresses");
+    }
+
+    return await response.json();
+  },
+
+  addAddress: async (addressData: Partial<Address>) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) throw new Error("No token found");
+
+    const response = await fetch("http://localhost:8080/api/user/address", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(addressData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add address");
+    }
+
+    return await response.json(); 
+  },
+
+  updateAddress: async (addressId: string, addressData: Partial<Address>) => {
+    const token = localStorage.getItem("authToken"); 
+    if (!token) throw new Error("No token found");
+
+    const response = await fetch(`http://localhost:8080/api/user/address/${addressId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(addressData),
+    });
+
+    if (!response.ok) throw new Error("Failed to update address");
+    return await response.json();
+  },
+
+  deleteAddress: async (addressId: string) => {
+    const token = localStorage.getItem("authToken");
+    if (!token) throw new Error("No token found");
+
+    const response = await fetch(`http://localhost:8080/api/user/address/${addressId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Failed to delete address");
+    return true;
+  },
+
   async getUsers(): Promise<User[]> {
     const res = await apiClient.get("/api/user/users");
     return safeGet(res, "data", "data") || safeGet(res, "data") || [];
@@ -141,7 +213,6 @@ export const userService = {
   },
 
   async updateUser(updatedData: Partial<User> & { id?: string }): Promise<User> {
-    // PUT /api/user/{id} - if id is not provided, use current user id
     const id = updatedData.id || currentUser?.id;
     if (!id) throw new Error("No user id provided");
 
@@ -151,7 +222,6 @@ export const userService = {
       const updatedUser = safeGet(res, "data", "data") || safeGet(res, "data");
 
       if (updatedUser) {
-        // normalize name if needed
         if (!updatedUser.name && ((updatedUser as any).firstName || (updatedUser as any).lastName)) {
           const f = (updatedUser as any).firstName || "";
           const l = (updatedUser as any).lastName || "";
@@ -166,7 +236,6 @@ export const userService = {
 
       throw new Error(`Failed to update user: server responded with status ${res?.status}`);
     } catch (err: any) {
-      // No response received (network error / CORS / backend unreachable)
       if (err?.request && !err?.response) {
         const url = err?.config?.url || `/api/user/${encodeURIComponent(id)}`;
         console.error("Network/CORS error when calling updateUser", { url, err });
@@ -181,6 +250,75 @@ export const userService = {
       console.error("Update user failed", { url, status, serverMsg });
       throw new Error(`Update failed: ${serverMsg} (url: ${url}, status: ${status})`);
     }
+  },
+
+  placeOrder: async (orderData: any) => {
+    const token = localStorage.getItem("authToken"); 
+    if (!token) throw new Error("User not authenticated");
+
+    const response = await fetch("http://localhost:8080/api/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(errorMsg || "Failed to place order");
+    }
+
+    return await response.text();
+  },
+
+  getOrderById: async (orderId: string | number): Promise<Order> => {
+    const token = localStorage.getItem("authToken"); 
+    
+    if (!token) {
+      throw new Error("User not authenticated");
+    }
+
+    const response = await fetch(`http://localhost:8080/api/order/${orderId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      if (response.status === 403) {
+        throw new Error("Access Denied: You do not have permission to view this order.");
+      }
+      if (response.status === 404) {
+        throw new Error("Order not found.");
+      }
+      
+      throw new Error(errorText || `Error fetching order (${response.status})`);
+    }
+
+    return await response.json();
+  },
+
+  getMyOrders: async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) throw new Error("Not authenticated");
+
+    const response = await fetch("http://localhost:8080/api/order/my-orders", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch orders");
+    
+    return await response.json(); 
   },
 
   async logout(): Promise<void> {
