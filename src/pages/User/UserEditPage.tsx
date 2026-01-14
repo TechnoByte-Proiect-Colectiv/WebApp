@@ -241,7 +241,7 @@ export const UserEditPage: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             disabled={isLoading}
-            helperText="Lasă gol dacă nu vrei să schimbi parola"
+            helperText="Leave blank to keep current password"
           />
           <TextField
             label="Confirm New Password"
