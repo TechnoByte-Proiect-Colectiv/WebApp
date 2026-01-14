@@ -37,6 +37,13 @@ export const ProductService = {
     return p;
   },
 
+  getReviewsForProduct: async (id: number): Promise<Review[]> => {
+    const response = await fetch(`${API_URL}/review/${id}`);
+    if(!response.ok) throw new Error("Error receiving reviews for product");
+    
+    return response.json();
+  },
+
   getBySlug: async (slug: string): Promise<ProductType> => {
     const response = await fetch(`${API_URL}/product/${slug}`);
     if (!response.ok) throw new Error("Product not found!");
@@ -45,13 +52,6 @@ export const ProductService = {
     p.image = "data:image/png;base64," + p.fileData;
 
     return p;
-  },
-
-  // get reviews for a product
-  getReviews: async (productId: number): Promise<Review[]> => {
-    const response = await fetch(`${API_URL}/products/${productId}/reviews`);
-    if (!response.ok) throw new Error("Failed to fetch reviews!");
-    return response.json();
   },
 
   // create a product
