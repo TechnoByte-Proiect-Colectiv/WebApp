@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link as RouterLink } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -16,7 +16,7 @@ import {
   TableContainer,
   TableRow,
   Paper,
-  Link,
+  Avatar,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";
@@ -41,30 +41,47 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
 
   const [showDescription, setShowDescription] = useState(true);
   const [showSpecs, setShowSpecs] = useState(false);
-  const [showReviews, setShowReviews] = useState(false);
+  const [showReviews, setShowReviews] = useState(true); 
 
   useEffect(() => {
     if (!slug) return;
     if (loading) return;
     setLoading(true);
     const prod = ProductService.getBySlug(slug);
-    prod.then((prod) => {
-      setProduct(prod || null);
-      setLoading(false);
-    });
+    prod
+      .then((prod) => {
+        setProduct(prod || null);
+        return ProductService.getReviewsForProduct(Number.parseInt(prod.id));
+      })
+      .then((fetchedReviews) => {
+        if (fetchedReviews) {
+          const sortedReviews = [...fetchedReviews].sort((a, b) => {
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          });
+          setReviews(sortedReviews);
+        } else {
+          setReviews([]);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [slug]);
 
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Product not found</div>;
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: number, size: "small" | "medium" = "medium") => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
         i <= rating ? (
-          <StarIcon key={i} sx={{ color: "#FFD700" }} />
+          <StarIcon key={i} fontSize={size} sx={{ color: "#FFD700" }} />
         ) : (
-          <StarBorderIcon key={i} sx={{ color: "#FFD700" }} />
+          <StarBorderIcon key={i} fontSize={size} sx={{ color: "#FFD700" }} />
         )
       );
     }
@@ -76,6 +93,18 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
     : product.rating;
 
   const reviewCount = reviews.length > 0 ? reviews.length : 0;
+
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString("ro-RO", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
 
   return (
     <Container sx={{ mt: 4, mb: 8 }}>
@@ -107,29 +136,18 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
               {product.name}
             </Typography>
 
-            {/* <Box display="flex" alignItems="center" gap={1} mt={1} mb={2}>
-                <StorefrontIcon fontSize="small" color="action" />
-                <Typography variant="body2" color="text.secondary">
-                    Sold by: {' '}
-                    <Link 
-                        component={RouterLink} 
-                        to={`/seller/${product.seller.slug}`}
-                        sx={{ fontWeight: 'bold', textDecoration: 'none' }}
-                    >
-                        {product.seller.name}
-                    </Link>
-                </Typography>
-            </Box> */}
-
-            {/* <Box display="flex" alignItems="center" gap={0.5}>
-              <Typography variant="h6" sx={{ color: "#FFD700", fontWeight: 'bold' }}>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <Typography
+                variant="h6"
+                sx={{ color: "#FFD700", fontWeight: "bold" }}
+              >
                 {displayRating.toFixed(1)}
               </Typography>
               <Box display="flex">{renderStars(Math.round(displayRating))}</Box>
               <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
                 ({reviewCount} reviews)
               </Typography>
-            </Box> */}
+            </Box>
           </Box>
 
           <Divider />
@@ -275,21 +293,60 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
                   No reviews yet for this product.
                 </Typography>
               )}
+
               {reviews.map((r) => (
-                <Card key={r.id} variant="outlined" sx={{ mb: 2 }}>
+                <Card
+                  key={r.id}
+                  variant="outlined"
+                  sx={{ mb: 3, borderRadius: 2 }}
+                >
                   <CardContent>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography fontWeight="bold">
-                        User {r.user_id}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {r.created_at}
-                      </Typography>
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="flex-start"
+                    >
+                      <Box display="flex" gap={2} alignItems="center">
+                        <Avatar sx={{ bgcolor: "primary.main" }}>
+                          {r.userId
+                            ? r.userId.toString().charAt(0).toUpperCase()
+                            : "U"}
+                        </Avatar>
+                        <Box>
+                          <Typography fontWeight="bold" variant="subtitle1">
+                            User {r.userId}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatDate(r.created_at)}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box display="flex" alignItems="center">
+                        {renderStars(r.rating, "small")}
+                      </Box>
                     </Box>
-                    <Box display="flex" mb={1}>
-                      {renderStars(r.rating)}
-                    </Box>
-                    <Typography variant="body2">{r.comment}</Typography>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    {r.title && (
+                      <Typography
+                        variant="h6"
+                        component="h3"
+                        gutterBottom
+                        sx={{ fontSize: "1rem", fontWeight: "bold" }}
+                      >
+                        {r.title}
+                      </Typography>
+                    )}
+
+                    <Typography
+                      variant="body2"
+                      color="text.primary"
+                      sx={{ lineHeight: 1.6 }}
+                    >
+                      {r.description}
+                    </Typography>
                   </CardContent>
                 </Card>
               ))}

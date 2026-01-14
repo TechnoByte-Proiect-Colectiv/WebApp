@@ -1,14 +1,58 @@
-import { Box, Button, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Skeleton, Typography } from "@mui/material";
+import StarIcon from "@mui/icons-material/Star";
 import { useCart } from "../../context/CartContext";
 import { ProductType } from "../../types/product/product";
 import { useNavigate } from "react-router-dom";
 import { generatePath } from "../../routes/routePaths";
+import { Review } from "../../types/product/review";
+import { ProductService } from "../../services/ProductService";
+
+const calculateAverageRating = (reviews: Review[] | undefined | null): number => {
+  if (!reviews || reviews.length === 0) return 0;
+  const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+  return total / reviews.length;
+};
 
 export const ProductCard: React.FC<{ product: ProductType }> = ({
   product,
 }) => {
   const { addToCart, isInCart, getProductQuantity } = useCart();
+  
+  const [rating, setRating] = useState<number>(0);
+  const [loadingRating, setLoadingRating] = useState<boolean>(true);
+  const [reviewCount, setReviewCount] = useState<number>(0);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let isMounted = true; 
+
+    const fetchRating = async () => {
+      try {
+        const reviews = await ProductService.getReviewsForProduct(Number(product.id));
+        
+        if (isMounted) {
+          if (reviews && reviews.length > 0) {
+            setRating(calculateAverageRating(reviews));
+            setReviewCount(reviews.length);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load rating for product", product.id);
+      } finally {
+        if (isMounted) {
+          setLoadingRating(false);
+        }
+      }
+    };
+
+    fetchRating();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [product.id]);
 
   const handleCardClick = () => {
     navigate(generatePath.productDetail(product.slug));
@@ -52,10 +96,36 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
           fontWeight="medium"
           title={product.name}
           noWrap
-          sx={{ mb: 1 }}
+          sx={{ mb: 0.5 }}
         >
           {product.name}
         </Typography>
+
+        <Box sx={{ height: 24, mb: 1, display: 'flex', alignItems: 'center' }}>
+            {loadingRating ? (
+                <Skeleton variant="text" width={60} height={20} />
+            ) : rating > 0 ? (
+                <Box display="flex" alignItems="center" gap={0.5}>
+                    <StarIcon sx={{ color: "#FFD700", fontSize: 18 }} />
+                    <Typography variant="body2" fontWeight="bold" color="text.primary">
+                        {rating.toFixed(1)}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        ({reviewCount})
+                    </Typography>
+                </Box>
+            ) : (
+                <Typography variant="caption" color="text.secondary">
+                    No reviews
+                </Typography>
+            )}
+        </Box>
+        
+        {product.rating === 0 && (
+             <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                No reviews yet
+             </Typography>
+        )}
 
         <Typography variant="body2" fontWeight="bold" sx={{ mb: 2 }}>
           {product.price.toFixed(2)} {product.currency}
