@@ -34,8 +34,6 @@ interface TabPanelProps {
   value: AuthMode;
 }
 
-const CONNECTION_TOKEN = "token"
-
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -53,7 +51,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export const LoginButton: FC = () => {
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, loginWithCredentials, login, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openAuthDialog, setOpenAuthDialog] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
@@ -63,7 +61,9 @@ export const LoginButton: FC = () => {
   const [loginPassword, setLoginPassword] = useState("");
 
   // Sign up form state
-  const [signupName, setSignupName] = useState("");
+  const [signupFirstName, setSignupFirstName] = useState("");
+  const [signupLastName, setSignupLastName] = useState("");
+  const [signupAddress, setSignupAddress] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
@@ -118,7 +118,9 @@ export const LoginButton: FC = () => {
   const resetForms = () => {
     setLoginEmail("");
     setLoginPassword("");
-    setSignupName("");
+    setSignupFirstName("");
+    setSignupLastName("");
+    setSignupAddress("");
     setSignupEmail("");
     setSignupPassword("");
     setSignupConfirmPassword("");
@@ -141,9 +143,7 @@ export const LoginButton: FC = () => {
         return;
       }
 
-      await userService.login({ email: loginEmail, password: loginPassword });
-      login(CONNECTION_TOKEN
-      );
+      await loginWithCredentials({ email: loginEmail, password: loginPassword });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -156,21 +156,23 @@ export const LoginButton: FC = () => {
     setLoading(true);
 
     try {
-      if (!signupName || !signupEmail || !signupPassword || !signupConfirmPassword) {
+      if (!signupFirstName || !signupLastName || !signupAddress || !signupEmail || !signupPassword || !signupConfirmPassword) {
         setError("Please fill in all fields");
         setLoading(false);
         return;
       }
 
-      await userService.signup({
-        name: signupName,
+      const { token } = await userService.signup({
+        firstName: signupFirstName,
+        lastName: signupLastName,
+        address: signupAddress,
         email: signupEmail,
         password: signupPassword,
         confirmPassword: signupConfirmPassword,
       });
-      login(CONNECTION_TOKEN);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign up failed");
+      if (token) login(token);
+    } catch (err: any) {
+      setError(err?.message || (err instanceof Error ? err.message : "Sign up failed"));
     } finally {
       setLoading(false);
     }
@@ -179,8 +181,11 @@ export const LoginButton: FC = () => {
   const handleLogout = async () => {
     setLoading(true);
     try {
+      navigate(ROUTES.HOME, { replace: true });
       await userService.logout();
       logout();
+      handleMenuClose();
+      setOpenAuthDialog(false);
     } finally {
       setLoading(false);
     }
@@ -337,12 +342,48 @@ export const LoginButton: FC = () => {
 
           <TabPanel value={authMode} index="signup">
             <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <TextField
+                  fullWidth
+                  label="First Name"
+                  value={signupFirstName}
+                  onChange={(e) => setSignupFirstName(e.target.value)}
+                  placeholder="John"
+                  disabled={loading}
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{
+                    className: "dark:text-neutral-400",
+                  }}
+                  InputProps={{
+                    className: "dark:text-neutral-100",
+                  }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Last Name"
+                  value={signupLastName}
+                  onChange={(e) => setSignupLastName(e.target.value)}
+                  placeholder="Doe"
+                  disabled={loading}
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{
+                    className: "dark:text-neutral-400",
+                  }}
+                  InputProps={{
+                    className: "dark:text-neutral-100",
+                  }}
+                />
+              </div>
+
               <TextField
                 fullWidth
-                label="Full Name"
-                value={signupName}
-                onChange={(e) => setSignupName(e.target.value)}
-                placeholder="John Doe"
+                label="Address"
+                value={signupAddress}
+                onChange={(e) => setSignupAddress(e.target.value)}
+                placeholder="Street, City, Country"
                 disabled={loading}
                 variant="outlined"
                 size="small"

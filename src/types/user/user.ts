@@ -3,11 +3,14 @@ import { Address } from "./address";
 export interface User {
   id: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
   role: 'user' | 'admin' | 'seller';
   addresses: Address[];
   email: string;
   avatar?: string;
   phone?: string;
+  address?: string;
   createdAt: string;
 }
 
@@ -17,7 +20,9 @@ export interface LoginCredentials {
 }
 
 export interface SignUpCredentials {
-  name: string;
+  firstName: string;
+  lastName: string;
+  address?: string;
   email: string;
   password: string;
   confirmPassword: string;

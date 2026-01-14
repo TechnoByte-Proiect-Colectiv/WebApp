@@ -17,11 +17,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Address } from "../../types/user/address";
 import { AddressManager } from "../../components/common/AddressManager";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
-import { Order } from "../../types/user/order";
-import {
-  OrderSummaryCard,
-  OrderSummaryCardProps,
-} from "../../components/features/order/OrderSummaryCard";
+import { OrderSummaryCardProps } from "../../components/features/order/OrderSummaryCard";
 import { OrderGridComponent } from "../../components/features/order/OrderGridComponent";
 
 const roleType = {
@@ -85,7 +81,7 @@ export const UserPage: React.FC = () => {
   }, [user]);
 
   if (!user) {
-    return <Navigate to={ROUTES.LOGIN} replace />;
+    return <Navigate to={ROUTES.HOME} replace />;
   }
 
   const handleAddAddress = () => {
@@ -154,10 +150,16 @@ export const UserPage: React.FC = () => {
             <Button
               variant="outlined"
               color="secondary"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
-                logout();
-                userService.logout();
+                // navigate to home first to avoid ProtectedRoute redirecting to login
+                navigate(ROUTES.HOME, { replace: true });
+                try {
+                  await userService.logout();
+                  await logout();
+                } catch (err) {
+                  console.error('logout error', err);
+                }
               }}
             >
               Log Out
