@@ -55,8 +55,8 @@ const Users = () => {
       setUsers(response.data);
       setError(null);
     } catch (err) {
-      console.error("Eroare la fetch users:", err);
-      setError("Nu s-au putut încărca utilizatorii. Verifică Backend-ul.");
+      console.error("Error at fetching users:", err);
+      setError("Users can't load. Please check the console.");
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +70,7 @@ const Users = () => {
   const handleCreateUser = async () => {
     // Validare simpla
     if (!newUser.email || !newUser.password || !newUser.firstName) {
-      alert("Te rog completează câmpurile obligatorii!");
+      alert("Please complete all required fields!");
       return;
     }
 
@@ -88,7 +88,7 @@ const Users = () => {
         dateCreated: new Date(),
       };
 
-      await axios.post(`${API_BASE_URL}/create`, payload);
+      await axios.post(`${API_BASE_URL}/signUp`, payload);
 
       setOpen(false);
       // Resetam formularul
@@ -103,7 +103,7 @@ const Users = () => {
       fetchUsers();
     } catch (err) {
       console.error(err);
-      alert("Eroare la crearea utilizatorului!");
+      alert("Error at creating user!");
     }
   };
 
@@ -111,7 +111,7 @@ const Users = () => {
   const handleDeleteUser = async (user) => {
     if (
       !window.confirm(
-        `Ești sigur că vrei să ștergi utilizatorul ${user.email}?`
+        `Are you sure you want to delete user ${user.email}?`
       )
     )
       return;
@@ -126,7 +126,7 @@ const Users = () => {
       setUsers(users.filter((u) => (u.id || u.email) !== identifier));
     } catch (err) {
       console.error(err);
-      alert("Eroare la ștergere. Verifică consola.");
+      alert("Error at deleting user. Check the console.");
     }
   };
 
@@ -153,18 +153,18 @@ const Users = () => {
         <Typography
           variant="h4"
           component="h1"
-          sx={{ fontWeight: "bold", color: "#1976d2" }}
+          sx={{ fontWeight: "bold", color: '#2563eb' }}
         >
-          Utilizatori
+          Users 
         </Typography>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => setOpen(true)}
-          sx={{ borderRadius: 2 }}
+          sx={{ borderRadius: 2, backgroundColor: '#2563eb' }}
         >
-          Utilizator Nou
+          New User
         </Button>
       </div>
 
@@ -187,22 +187,19 @@ const Users = () => {
           sx={{ borderRadius: 2 }}
         >
           <Table sx={{ minWidth: 650 }}>
-            <TableHead sx={{ backgroundColor: "#f8f9fa" }}>
+            <TableHead sx={{  }}>
               <TableRow>
                 <TableCell>
-                  <strong>Nume Complet</strong>
+                  <strong>Full Name</strong>
                 </TableCell>
                 <TableCell>
                   <strong>Email</strong>
                 </TableCell>
-                <TableCell>
-                  <strong>Adresă</strong>
-                </TableCell>
                 <TableCell align="center">
-                  <strong>Tip Cont</strong>
+                  <strong>Account Type</strong>
                 </TableCell>
                 <TableCell align="right">
-                  <strong>Acțiuni</strong>
+                  <strong>Actions</strong>
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -218,10 +215,12 @@ const Users = () => {
                     </div>
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.address || "-"}</TableCell>
                   <TableCell align="center">
                     {user.isAdmin ? (
-                      <Chip label="Admin" color="primary" size="small" />
+                      <Chip label="Admin" size="small" sx={{ 
+                        backgroundColor: '#2563eb',
+                        color: 'white', 
+                      }} />
                     ) : (
                       <Chip label="User" variant="outlined" size="small" />
                     )}
@@ -244,7 +243,7 @@ const Users = () => {
                     align="center"
                     sx={{ py: 3, color: "gray" }}
                   >
-                    Nu există utilizatori în baza de date.
+                    No users in database.
                   </TableCell>
                 </TableRow>
               )}
@@ -260,7 +259,7 @@ const Users = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Adaugă Utilizator</DialogTitle>
+        <DialogTitle>Add User</DialogTitle>
         <DialogContent dividers>
           <div
             style={{
@@ -270,7 +269,7 @@ const Users = () => {
             }}
           >
             <TextField
-              label="Prenume (First Name)"
+              label="First Name"
               name="firstName"
               value={newUser.firstName}
               onChange={handleInputChange}
@@ -278,7 +277,7 @@ const Users = () => {
               required
             />
             <TextField
-              label="Nume (Last Name)"
+              label="Last Name"
               name="lastName"
               value={newUser.lastName}
               onChange={handleInputChange}
@@ -299,25 +298,14 @@ const Users = () => {
 
           <TextField
             margin="normal"
-            label="Parolă"
+            label="Password"
             name="password"
             type="password"
             value={newUser.password}
             onChange={handleInputChange}
             fullWidth
             required
-            helperText="Parola va fi criptată automat."
-          />
-
-          <TextField
-            margin="normal"
-            label="Adresă Fizică"
-            name="address"
-            value={newUser.address}
-            onChange={handleInputChange}
-            fullWidth
-            multiline
-            rows={2}
+            helperText="Password will be encrypted automatically."
           />
 
           <div style={{ marginTop: "15px" }}>
@@ -331,22 +319,22 @@ const Users = () => {
               }
               label={
                 newUser.isAdmin
-                  ? "Cont Administrator"
-                  : "Cont Utilizator Standard"
+                  ? "Admin Account"
+                  : "Standard User Account"
               }
             />
           </div>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={() => setOpen(false)} color="inherit">
-            Anulează
+            Cancel
           </Button>
           <Button
             onClick={handleCreateUser}
             variant="contained"
             color="primary"
           >
-            Salvează Utilizatorul
+            Save User
           </Button>
         </DialogActions>
       </Dialog>

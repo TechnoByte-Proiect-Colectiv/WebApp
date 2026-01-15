@@ -28,7 +28,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ImageIcon from "@mui/icons-material/Image";
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "http://localhost:8080/api/product";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -72,7 +72,7 @@ const Products = () => {
   const loadProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/product/search?search=`);
+      const response = await fetch(`${API_BASE_URL}/all`);
       if (!response.ok) throw new Error("Failed to fetch");
       const rawData = await response.json();
       const normalizedData = Array.isArray(rawData)
@@ -134,7 +134,7 @@ const Products = () => {
   // Functie unificată SAVE (Create sau Update)
   const handleSave = async () => {
     if (!formData.title || !formData.price || !formData.stock) {
-      alert("Te rog completează Titlul, Prețul și Stocul!");
+      alert("Please complete title, price and stock!");
       return;
     }
 
@@ -183,14 +183,14 @@ const Products = () => {
       let response;
       if (editId) {
         // --- UPDATE (PUT) ---
-        response = await fetch(`${API_BASE_URL}/product`, {
+        response = await fetch(`${API_BASE_URL}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
       } else {
         // --- CREATE (POST) ---
-        response = await fetch(`${API_BASE_URL}/product`, {
+        response = await fetch(`${API_BASE_URL}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -202,11 +202,11 @@ const Products = () => {
         resetForm();
         loadProducts(); // Refresh
       } else {
-        alert("Eroare la salvare. Verifică Backend-ul.");
+        alert("Error at creating product.");
       }
     } catch (err) {
       console.error(err);
-      alert("Eroare de conexiune.");
+      alert("Connection error.");
       console.log(JSON.stringify(payload));
     }
   };
@@ -214,7 +214,7 @@ const Products = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure?")) return;
     try {
-      await fetch(`${API_BASE_URL}/product/${id}`, { method: "DELETE" });
+      await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
       setProducts(products.filter((p) => p.id !== id));
     } catch (err) {
       console.error(err);
@@ -258,7 +258,7 @@ const Products = () => {
           variant="h4"
           component="h1"
           fontWeight="bold"
-          color="primary"
+          sx={{ color: '#2563eb' }}
         >
           Inventory Management
         </Typography>
@@ -267,6 +267,7 @@ const Products = () => {
           startIcon={<AddIcon />}
           onClick={handleOpenAdd}
           size="large"
+          sx={{ backgroundColor: '#2563eb' }}
         >
           Add Product
         </Button>
@@ -357,9 +358,8 @@ const Products = () => {
                     <TableCell align="right">
                       {/*Buton Edit */}
                       <IconButton
-                        color="primary"
                         onClick={() => handleEditClick(p)}
-                        sx={{ mr: 1 }}
+                        sx={{ mr: 1,  color: '#2563eb'}}
                       >
                         <EditIcon />
                       </IconButton>

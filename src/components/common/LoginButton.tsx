@@ -25,6 +25,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes/routePaths";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 
 type AuthMode = "login" | "signup";
 
@@ -229,6 +230,19 @@ export const LoginButton: FC = () => {
             <AccountCircleIcon fontSize="small" className="mr-2" />
             Profile
           </MenuItem>
+
+          {(currentUser.isAdmin) && (
+            <MenuItem 
+              onClick={() => {
+                navigate("/admin/dashboard");
+                handleMenuClose();
+              }}
+              className="text-purple-600 dark:text-purple-400 font-semibold"
+            >
+              <AdminPanelSettingsIcon fontSize="small" className="mr-2" />
+              Admin Panel
+            </MenuItem>
+          )}
 
           <MenuItem onClick={handleLogout} disabled={loading}>
             <LogoutIcon fontSize="small" className="mr-2" />
