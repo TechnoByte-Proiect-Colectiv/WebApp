@@ -11,7 +11,7 @@ import {
   Chip,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
-import { mockOrders, userService } from "../../services/userService";
+import { userService } from "../../services/userService";
 import { ROUTES } from "../../routes/routePaths";
 import { useAuth } from "../../context/AuthContext";
 import { Address } from "../../types/user/address";

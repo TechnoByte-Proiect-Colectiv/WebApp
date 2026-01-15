@@ -35,6 +35,7 @@ import { useCart } from "../../context/CartContext";
 import { Review } from "../../types/product/review";
 import { ProductService } from "../../services/ProductService";
 import { ReviewService } from "../../services/ReviewService";
+import { MOCK_CATEGORIES } from "../../context/mockProducts";
 
 export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
   reviews: propReviews,
@@ -169,7 +170,7 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
             style={{ width: "100%", borderRadius: 8, objectFit: "cover" }}
           />
           <Chip
-            label={product.category}
+            label={MOCK_CATEGORIES.find((el) => el.slug === product.category)?.name || product.category}
             color="primary"
             size="small"
             sx={{ position: "absolute", top: 10, left: 10 }}

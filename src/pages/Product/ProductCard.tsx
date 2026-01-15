@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Skeleton, Typography } from "@mui/material";
+import { Box, Button, Skeleton, Typography, Chip } from "@mui/material"; 
 import StarIcon from "@mui/icons-material/Star";
 import { useCart } from "../../context/CartContext";
 import { ProductType } from "../../types/product/product";
@@ -24,6 +24,7 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
   const [reviewCount, setReviewCount] = useState<number>(0);
 
   const navigate = useNavigate();
+  const isOutOfStock = product.quantity === 0; 
 
   useEffect(() => {
     let isMounted = true; 
@@ -75,6 +76,7 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
         border: "1px solid",
         borderColor: "divider",
         overflow: "hidden",
+        opacity: isOutOfStock ? 0.8 : 1, 
         "&.dark": {
           boxShadow: 1,
           borderColor: "divider",
@@ -82,12 +84,28 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
         },
       }}
     >
-      <Box className="w-full h-40" sx={{ overflow: "hidden" }}>
+      <Box className="w-full h-40" sx={{ overflow: "hidden", position: "relative" }}>
         <img
           className="w-full h-full object-cover transition-transform group-hover:scale-105"
           src={product.image}
           alt={product.name}
+          style={{ filter: isOutOfStock ? "grayscale(100%)" : "none" }} 
         />
+        
+        {isOutOfStock && (
+            <Chip 
+                label="Out of Stock" 
+                color="error" 
+                size="small" 
+                sx={{ 
+                    position: 'absolute', 
+                    top: 8, 
+                    right: 8, 
+                    fontWeight: 'bold',
+                    boxShadow: 1
+                }} 
+            />
+        )}
       </Box>
 
       <Box className="flex flex-col flex-grow p-3">
@@ -96,7 +114,7 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
           fontWeight="medium"
           title={product.name}
           noWrap
-          sx={{ mb: 0.5 }}
+          sx={{ mb: 0.5, color: isOutOfStock ? 'text.secondary' : 'text.primary' }}
         >
           {product.name}
         </Typography>
@@ -106,7 +124,7 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
                 <Skeleton variant="text" width={60} height={20} />
             ) : rating > 0 ? (
                 <Box display="flex" alignItems="center" gap={0.5}>
-                    <StarIcon sx={{ color: "#FFD700", fontSize: 18 }} />
+                    <StarIcon sx={{ color: isOutOfStock ? "grey.400" : "#FFD700", fontSize: 18 }} />
                     <Typography variant="body2" fontWeight="bold" color="text.primary">
                         {rating.toFixed(1)}
                     </Typography>
@@ -136,15 +154,27 @@ export const ProductCard: React.FC<{ product: ProductType }> = ({
         <Button
           onClick={(e) => {
             e.stopPropagation();
-            addToCart(product);
+            if (!isOutOfStock) {
+                addToCart(product);
+            }
           }}
-          variant={isInCart(product.id) ? "outlined" : "contained"}
+          variant={isOutOfStock ? "contained" : isInCart(product.id) ? "outlined" : "contained"}
           size="small"
           fullWidth
+          disabled={isOutOfStock} 
+          sx={{
+            "&.Mui-disabled": {
+                bgcolor: "action.disabledBackground",
+                color: "text.disabled"
+            }
+          }}
         >
-          {isInCart(product.id)
-            ? `In basket (${getProductQuantity(product.id)})`
-            : "Add to cart"}
+          {isOutOfStock 
+            ? "Out of Stock" 
+            : isInCart(product.id)
+                ? `In basket (${getProductQuantity(product.id)})`
+                : "Add to cart"
+          }
         </Button>
       </Box>
     </Box>

@@ -1,8 +1,4 @@
-import {
-  useState,
-  useEffect,
-  FC,
-} from "react";
+import { useState, useEffect, FC } from "react";
 import {
   Button,
   Menu,
@@ -83,10 +79,16 @@ export const LoginButton: FC = () => {
       setCurrentUser(userService.getCurrentUser());
     };
 
-    window.addEventListener('userUpdated', handleUserUpdate);
+    const handleUserLogout = () => {
+      setCurrentUser(null); // Ștergem userul din state-ul local instant
+    };
+
+    window.addEventListener("userUpdated", handleUserUpdate);
+    window.addEventListener("userLoggedOut", handleUserLogout);
 
     return () => {
-      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener("userUpdated", handleUserUpdate);
+      window.removeEventListener("userLoggedOut", handleUserLogout);
     };
   }, []);
 
@@ -143,7 +145,10 @@ export const LoginButton: FC = () => {
         return;
       }
 
-      await loginWithCredentials({ email: loginEmail, password: loginPassword });
+      await loginWithCredentials({
+        email: loginEmail,
+        password: loginPassword,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -156,9 +161,14 @@ export const LoginButton: FC = () => {
     setLoading(true);
 
     try {
-      if (!signupFirstName || !signupLastName || 
-        // !signupAddress || 
-        !signupEmail || !signupPassword || !signupConfirmPassword) {
+      if (
+        !signupFirstName ||
+        !signupLastName ||
+        // !signupAddress ||
+        !signupEmail ||
+        !signupPassword ||
+        !signupConfirmPassword
+      ) {
         setError("Please fill in all fields");
         setLoading(false);
         return;
@@ -174,7 +184,9 @@ export const LoginButton: FC = () => {
       });
       if (token) login(token);
     } catch (err: any) {
-      setError(err?.message || (err instanceof Error ? err.message : "Sign up failed"));
+      setError(
+        err?.message || (err instanceof Error ? err.message : "Sign up failed")
+      );
     } finally {
       setLoading(false);
     }
@@ -222,7 +234,9 @@ export const LoginButton: FC = () => {
           transformOrigin={{ vertical: "top", horizontal: "right" }}
         >
           <MenuItem disabled>
-            <span className="text-xs text-neutral-500">{currentUser.email}</span>
+            <span className="text-xs text-neutral-500">
+              {currentUser.email}
+            </span>
           </MenuItem>
 
           <MenuItem onClick={handleProfileClick}>
@@ -280,8 +294,18 @@ export const LoginButton: FC = () => {
               },
             }}
           >
-            <Tab label="Sign In" value="login" id="auth-tab-login" aria-controls="auth-tabpanel-login" />
-            <Tab label="Sign Up" value="signup" id="auth-tab-signup" aria-controls="auth-tabpanel-signup" />
+            <Tab
+              label="Sign In"
+              value="login"
+              id="auth-tab-login"
+              aria-controls="auth-tabpanel-login"
+            />
+            <Tab
+              label="Sign Up"
+              value="signup"
+              id="auth-tab-signup"
+              aria-controls="auth-tabpanel-signup"
+            />
           </Tabs>
         </DialogTitle>
 
@@ -470,7 +494,13 @@ export const LoginButton: FC = () => {
             variant="contained"
             className="bg-brand-500 hover:bg-brand-600 text-white"
           >
-            {loading ? (authMode === "login" ? "Signing in..." : "Creating account...") : (authMode === "login" ? "Sign In" : "Sign Up")}
+            {loading
+              ? authMode === "login"
+                ? "Signing in..."
+                : "Creating account..."
+              : authMode === "login"
+              ? "Sign In"
+              : "Sign Up"}
           </Button>
         </DialogActions>
       </Dialog>

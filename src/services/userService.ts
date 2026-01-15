@@ -8,10 +8,6 @@ import {
 } from "../types/user/user";
 import apiClient from "./apiClient";
 
-export const mockOrders: Order[] = [
-
-];
-
 const TOKEN_KEY = "authToken";
 const USER_KEY = "currentUser";
 
@@ -127,73 +123,22 @@ export const userService = {
   },
 
   getUserAddresses: async () => {
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("No token found");
-
-    const response = await fetch("http://localhost:8080/api/user/address", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch addresses");
-    }
-
-    return await response.json();
+    const response = await apiClient.get("/api/user/address");
+    return response.data;
   },
 
   addAddress: async (addressData: Partial<Address>) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("No token found");
-
-    const response = await fetch("http://localhost:8080/api/user/address", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify(addressData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to add address");
-    }
-
-    return await response.json(); 
+    const response = await apiClient.post("/api/user/address", addressData);
+    return response.data;
   },
 
   updateAddress: async (addressId: string, addressData: Partial<Address>) => {
-    const token = localStorage.getItem("authToken"); 
-    if (!token) throw new Error("No token found");
-
-    const response = await fetch(`http://localhost:8080/api/user/address/${addressId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify(addressData),
-    });
-
-    if (!response.ok) throw new Error("Failed to update address");
-    return await response.json();
+    const response = await apiClient.put(`/api/user/address/${addressId}`, addressData);
+    return response.data;
   },
 
   deleteAddress: async (addressId: string) => {
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("No token found");
-
-    const response = await fetch(`http://localhost:8080/api/user/address/${addressId}`, {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) throw new Error("Failed to delete address");
+    const response = await apiClient.delete(`/api/user/address/${addressId}`);
     return true;
   },
 
@@ -253,72 +198,18 @@ export const userService = {
   },
 
   placeOrder: async (orderData: any) => {
-    const token = localStorage.getItem("authToken"); 
-    if (!token) throw new Error("User not authenticated");
-
-    const response = await fetch("http://localhost:8080/api/order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify(orderData),
-    });
-
-    if (!response.ok) {
-        const errorMsg = await response.text();
-        throw new Error(errorMsg || "Failed to place order");
-    }
-
-    return await response.text();
+    const response = await apiClient.post("/api/order", orderData);
+    return response.data;
   },
 
   getOrderById: async (orderId: string | number): Promise<Order> => {
-    const token = localStorage.getItem("authToken"); 
-    
-    if (!token) {
-      throw new Error("User not authenticated");
-    }
-
-    const response = await fetch(`http://localhost:8080/api/order/${orderId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-
-      if (response.status === 403) {
-        throw new Error("Access Denied: You do not have permission to view this order.");
-      }
-      if (response.status === 404) {
-        throw new Error("Order not found.");
-      }
-      
-      throw new Error(errorText || `Error fetching order (${response.status})`);
-    }
-
-    return await response.json();
+    const response = await apiClient.get(`/api/order/${orderId}`);
+    return response.data;
   },
 
   getMyOrders: async () => {
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("Not authenticated");
-
-    const response = await fetch("http://localhost:8080/api/order/my-orders", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) throw new Error("Failed to fetch orders");
-    
-    return await response.json(); 
+    const response = await apiClient.get("/api/order/my-orders");
+    return response.data;
   },
 
   async logout(): Promise<void> {
@@ -334,6 +225,8 @@ export const userService = {
 
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+
+    delete apiClient.defaults.headers.Authorization;
 
     window.dispatchEvent(new Event("userLoggedOut"));
   },
@@ -366,12 +259,5 @@ export const userService = {
 
   isAuthenticated(): boolean {
     return !!this.getToken();
-  },
-
-  getMockCredentials() {
-    return [
-      { email: "user@example.com", password: "password123" },
-      { email: "demo@example.com", password: "demo123" },
-    ];
   },
 };
