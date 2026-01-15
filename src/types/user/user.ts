@@ -12,7 +12,8 @@ export interface User {
   avatar?: string;
   phone?: string;
   address?: string;
-  createdAt: string;
+  dateCreated: string;
+  avatarUrl?: string;
 }
 
 export interface LoginCredentials {
