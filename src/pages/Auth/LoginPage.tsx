@@ -18,8 +18,8 @@ export const LoginPage: React.FC = () => {
   const location = useLocation();
   const { loginWithCredentials, isAuthenticated } = useAuth();
 
-  const [email, setEmail] = useState("user@example.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,7 +79,7 @@ export const LoginPage: React.FC = () => {
             required
             fullWidth
             id="email"
-            label="Email (user@example.com)"
+            label="Email"
             name="email"
             autoComplete="email"
             autoFocus
@@ -92,7 +92,7 @@ export const LoginPage: React.FC = () => {
             required
             fullWidth
             name="password"
-            label="Parolă (password123)"
+            label="Parola"
             type="password"
             id="password"
             autoComplete="current-password"

@@ -79,9 +79,9 @@ export const HomePage = () => {
   return (
     <div className="">
       <HeroSection
-        title="November Sales!"
-        description="50% off everything"
-        buttonText="Buy Now"
+        title="Discover Quality Products"
+        description="From latest tech to home essentials. Find everything you need."
+        buttonText="Start Exploring"
       ></HeroSection>
       <Container>
         <CategorySection categories={categories}></CategorySection>

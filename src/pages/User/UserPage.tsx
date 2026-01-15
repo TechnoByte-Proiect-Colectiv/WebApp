@@ -11,7 +11,7 @@ import {
   Chip,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
-import { mockOrders, userService } from "../../services/userService";
+import { userService } from "../../services/userService";
 import { ROUTES } from "../../routes/routePaths";
 import { useAuth } from "../../context/AuthContext";
 import { Address } from "../../types/user/address";
@@ -26,7 +26,7 @@ import { ReviewService } from "../../services/ReviewService";
 const roleType = {
   user: "Client",
   admin: "Administrator",
-  seller: "Seller",
+  // seller: "Seller",
 };
 
 export const UserPage: React.FC = () => {
@@ -166,7 +166,7 @@ export const UserPage: React.FC = () => {
             <Typography variant="subtitle1">{user.email}</Typography>
             <Chip
               icon={<PermIdentityIcon />}
-              label={roleType[user.role]}
+              label={roleType[user.isAdmin ? "admin" : "user"]}
               variant="outlined"
               sx={{
                 mt: 1,

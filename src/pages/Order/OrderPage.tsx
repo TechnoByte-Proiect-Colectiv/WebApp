@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { generatePath, ROUTES } from "../../routes/routePaths";
 import { Order } from "../../types/user/order";
-import { mockOrders, userService } from "../../services/userService";
+import { userService } from "../../services/userService";
 import {
   Alert,
   Avatar,

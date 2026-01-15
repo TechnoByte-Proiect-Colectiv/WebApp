@@ -1,147 +1,85 @@
 import { ProductType } from "../types/product/product";
 import { Review } from "../types/product/review";
+import apiClient from "./apiClient";
 
-const API_URL = "http://localhost:8080/api";
+const ENDPOINT = "/api";
 
 export const ProductService = {
   // get all products
   getAll: async (): Promise<ProductType[]> => {
-    const response = await fetch(`${API_URL}/product`);
-    if (!response.ok) throw new Error("Failed to fetch products!");
+    const response = await apiClient.get(`${ENDPOINT}/product`);
+    
+    let pt: ProductType[] = response.data;
 
-    let pt: ProductType[];
-    pt = await response.json();
-
+    // Logica ta de mapare imagine ramane
     pt.map((p) => p.image = "data:image/png;base64," + p.fileData);
 
     return pt;
   },
 
   getRandom: async (count: number): Promise<ProductType[]> => {
-    const response = await fetch(`${API_URL}/product`);
-    if (!response.ok) throw new Error("Failed to fetch random products!");
-
-    const products = await response.json();
+    const response = await apiClient.get(`${ENDPOINT}/product`);
+    
+    const products = response.data;
     const shuffled = [...products].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
   },
 
   // get a product by ID
   getById: async (id: number): Promise<ProductType> => {
-    const response = await fetch(`${API_URL}/product/${id}`);
-    if (!response.ok) throw new Error("Product not found!");
-    let p: ProductType;
-    p = await response.json();
+    const response = await apiClient.get(`${ENDPOINT}/product/${id}`);
+    
+    let p: ProductType = response.data;
     p.image = "data:image/png;base64," + p.fileData;
 
     return p;
   },
 
   getReviewsForProduct: async (id: number): Promise<Review[]> => {
-    const response = await fetch(`${API_URL}/review/product/${id}`);
-    if(!response.ok) throw new Error("Error receiving reviews for product");
-    
-    return response.json();
+    const response = await apiClient.get(`${ENDPOINT}/review/product/${id}`);
+    return response.data;
   },
 
   getBySlug: async (slug: string): Promise<ProductType> => {
-    const response = await fetch(`${API_URL}/product/${slug}`);
-    if (!response.ok) throw new Error("Product not found!");
-    let p: ProductType;
-    p = await response.json();
+    const response = await apiClient.get(`${ENDPOINT}/product/${slug}`);
+    
+    let p: ProductType = response.data;
     p.image = "data:image/png;base64," + p.fileData;
 
     return p;
   },
 
   // create a product
-  createProduct: async (
-    product: ProductType,
-    token: string
-  ): Promise<ProductType> => {
-    const response = await fetch(`${API_URL}/products`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(product),
-    });
-    if (!response.ok) throw new Error("Failed to create product!");
-    return response.json();
+  createProduct: async (product: ProductType): Promise<ProductType> => {
+    const response = await apiClient.post(`${ENDPOINT}/products`, product);
+    return response.data;
   },
 
   // update a product
-  updateProduct: async (
-    product: ProductType,
-    token: string
-  ): Promise<ProductType> => {
-    const response = await fetch(`${API_URL}/products/${product.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(product),
-    });
-    if (!response.ok) throw new Error("Failed to update product!");
-    return response.json();
+  updateProduct: async (product: ProductType): Promise<ProductType> => {
+    const response = await apiClient.put(`${ENDPOINT}/products/${product.id}`, product);
+    return response.data;
   },
 
   // delete a product
-  deleteProduct: async (productId: number, token: string): Promise<void> => {
-    const response = await fetch(`${API_URL}/products/${productId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Failed to delete product!");
+  deleteProduct: async (productId: number): Promise<void> => {
+    await apiClient.delete(`${ENDPOINT}/products/${productId}`);
   },
 
   // create a review
-  createReview: async (
-    productId: number,
-    review: Review,
-    token: string
-  ): Promise<Review> => {
-    const response = await fetch(`${API_URL}/products/${productId}/reviews`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(review),
-    });
-    if (!response.ok) throw new Error("Failed to create review!");
-    return response.json();
+  createReview: async (productId: number, review: Review): Promise<Review> => {
+    const response = await apiClient.post(`${ENDPOINT}/products/${productId}/reviews`, review);
+    return response.data;
   },
 
   // update a review
-  updateReview: async (
-    productId: number,
-    review: Review,
-    token: string
-  ): Promise<Review> => {
-    const response = await fetch(
-      `${API_URL}/products/${productId}/reviews/${review.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(review),
-      }
-    );
-    if (!response.ok) throw new Error("Failed to update review!");
-    return response.json();
+  updateReview: async (productId: number, review: Review): Promise<Review> => {
+    const response = await apiClient.put(`${ENDPOINT}/products/${productId}/reviews/${review.id}`, review);
+    return response.data;
   },
 
   // delete a review
-  deleteReview: async (reviewId: number, token: string): Promise<void> => {
-    const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Failed to delete review!");
+  deleteReview: async (reviewId: number): Promise<void> => {
+    await apiClient.delete(`${ENDPOINT}/reviews/${reviewId}`);
   },
 };
