@@ -17,6 +17,12 @@ import {
   TableRow,
   Paper,
   Avatar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Rating,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";
@@ -28,6 +34,7 @@ import { ProductType } from "../../types/product/product";
 import { useCart } from "../../context/CartContext";
 import { Review } from "../../types/product/review";
 import { ProductService } from "../../services/ProductService";
+import { ReviewService } from "../../services/ReviewService";
 
 export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
   reviews: propReviews,
@@ -42,6 +49,9 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
   const [showDescription, setShowDescription] = useState(true);
   const [showSpecs, setShowSpecs] = useState(false);
   const [showReviews, setShowReviews] = useState(true); 
+
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
+  const [newReview, setNewReview] = useState({ title: '', description: '', rating: 5 });
 
   useEffect(() => {
     if (!slug) return;
@@ -86,6 +96,42 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
       );
     }
     return stars;
+  };
+
+  const handleSaveReview = async () => {
+    console.log("1. Buton apasat"); 
+    
+    if (!product) {
+        console.log("2. Eroare: Obiectul product este null");
+        return;
+    }
+
+    try {
+        console.log("3. Pregatire date pentru productId:", product.id);
+        
+        const reviewData = {
+            productId: Number(product.id),
+            rating: newReview.rating,
+            title: newReview.title,
+            description: newReview.description,
+            verifiedPurchase: true
+        };
+
+        console.log("4. Trimitere cerere catre Axios...");
+        
+        const response = await ReviewService.saveReview(reviewData);
+        
+        console.log("5. Raspuns primit:", response);
+
+        setReviewModalOpen(false);
+        setNewReview({ title: '', description: '', rating: 5 });
+        const updated = await ProductService.getReviewsForProduct(Number(product.id));
+        setReviews(updated || []);
+        
+    } catch (e: any) {
+        console.error("6. Eroare prinsa in catch:", e);
+        alert("Eroare: " + (e.response?.data || e.message));
+    }
   };
 
   const displayRating = reviews.length
@@ -287,6 +333,9 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
             <Typography>{showReviews ? "−" : "+"}</Typography>
           </Box>
           <Collapse in={showReviews}>
+            <Box display="flex" justifyContent="right" alignItems="center" p={2}>
+                <Button variant="contained" onClick={() => setReviewModalOpen(true)}>Add Review</Button>
+            </Box>
             <Box p={2}>
               {reviews.length === 0 && (
                 <Typography color="text.secondary" align="center" py={2}>
@@ -354,6 +403,40 @@ export const ProductPage: React.FC<{ reviews?: Review[] }> = ({
           </Collapse>
         </Paper>
       </Box>
+
+      {/* Reviews Modal */}
+      <Dialog open={isReviewModalOpen} onClose={() => setReviewModalOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Add a New Review</DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" gap={2} pt={1}>
+            <Box display="flex" alignItems="center" gap={1}>
+                <Typography>Rating:</Typography>
+                <Rating 
+                    value={newReview.rating} 
+                    onChange={(_, val) => setNewReview({...newReview, rating: val || 5})} 
+                />
+            </Box>
+            <TextField 
+                label="Title" 
+                fullWidth 
+                value={newReview.title} 
+                onChange={(e) => setNewReview({...newReview, title: e.target.value})} 
+            />
+            <TextField 
+                label="Comment" 
+                fullWidth 
+                multiline 
+                rows={4} 
+                value={newReview.description} 
+                onChange={(e) => setNewReview({...newReview, description: e.target.value})} 
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setReviewModalOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleSaveReview}>Submit Review</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
