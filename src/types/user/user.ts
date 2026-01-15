@@ -12,7 +12,7 @@ export interface User {
   avatar?: string;
   phone?: string;
   address?: string;
-  createdAt: string;
+  dateCreated: string;
 }
 
 export interface LoginCredentials {

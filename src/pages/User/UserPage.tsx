@@ -72,12 +72,22 @@ export const UserPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user && user.createdAt) {
-      const date = new Date(user.createdAt);
-      const formattedDate = date.toLocaleDateString("ro-RO") + " at " + 
-                            date.toLocaleTimeString("ro-RO", { hour: '2-digit', minute: '2-digit' });
+    if (user && user.dateCreated) {
+      // În JavaScript, new Date(1768341600000) funcționează perfect
+      const date = new Date(user.dateCreated);
       
-      setAbout(formattedDate);
+      // Verificăm dacă data este validă
+      if (!isNaN(date.getTime())) {
+        const formattedDate = date.toLocaleDateString("ro-RO", {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+
+        setAbout(`${formattedDate}`);
+      } else {
+        setAbout("Invalid Date");
+      }
     }
 
     // fetch user addresses
