@@ -26,20 +26,22 @@ export const userService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       const res = await apiClient.post("/api/user/login", credentials);
+      
       const token = res.data.authToken || res.data.token;
+      const user = res.data.user; 
 
       if (!token) {
-        throw new Error("Nu am primit token de la server.");
+        throw new Error("We didn't received token.");
+      }
+      if (!user) {
+        throw new Error("We didn't received user data.");
       }
 
       localStorage.setItem(TOKEN_KEY, token);
       apiClient.defaults.headers.Authorization = `Bearer ${token}`;
 
-      const profileRes = await apiClient.get(`/api/user/profile?email=${encodeURIComponent(credentials.email)}`);
-      const user = profileRes.data; 
-
-      if (!user) {
-        throw new Error("Login successful, but cannot retrieve user profile.");
+      if (!user.name && (user.firstName || user.lastName)) {
+        user.name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
       }
 
       currentToken = token;
@@ -51,6 +53,7 @@ export const userService = {
       return { token, user };
     } catch (err: any) {
       localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
       console.error('Login failed', err);
       throw err;
     }
