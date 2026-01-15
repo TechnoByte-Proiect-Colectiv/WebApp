@@ -13,7 +13,6 @@ export interface User {
   phone?: string;
   address?: string;
   dateCreated: string;
-  avatarUrl?: string;
 }
 
 export interface LoginCredentials {
