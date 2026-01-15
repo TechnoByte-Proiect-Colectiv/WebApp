@@ -1,92 +1,88 @@
 import React, { useState, useEffect, useRef } from "react";
-// Ajusteaza calea catre logo-ul tau
-import logo from "../../logo.svg";
+import { useNavigate } from "react-router-dom";
+import { userService } from "../../services/userService";
+import { ROUTES } from "../../routes/routePaths";
 
 const Navbar = () => {
-  // Starea pentru vizibilitatea dropdown-ului
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  // Ref (referinta) pentru a "tine minte" elementul dropdown
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+  const user = userService.getCurrentUser();
 
-  // Acest efect se ocupa de inchiderea dropdown-ului
-  // daca utilizatorul da click in alta parte
   useEffect(() => {
-    // Functia care ruleaza la orice click pe pagina
     const handleClickOutside = (event) => {
-      // Verificam daca dropdown-ul exista (e randat)
-      // si daca click-ul NU a fost in interiorul lui
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     };
-
-    // Adaugam event listener-ul cand componenta se "monteaza"
     document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    // Curatam (inlaturam) listener-ul cand componenta "dispare"
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []); // [] inseamna ca efectul ruleaza o singura data (la montare)
+  const handleLogout = async () => {
+    await userService.logout();
+    setIsDropdownOpen(false);
+    navigate(ROUTES.LOGIN);
+  };
 
   return (
-    <header className="bg-white shadow-md p-4 flex justify-between items-center">
-      {/* Partea stanga: Logo */}
-      <div>
-        <img src={logo} alt="Logo" className="h-8 w-auto" />
-      </div>
+    <header className="bg-white shadow-md p-4 flex justify-end items-center">
 
-      {/* Partea dreapta: Meniu "Contul meu" */}
       <div className="relative" ref={dropdownRef}>
-        {/* Butonul care comuta starea dropdown-ului */}
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center space-x-2 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md transition-colors"
+          className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg transition-all shadow-lg active:scale-95"
         >
-          {/* Aici poti adauga si o iconita de utilizator */}
-          <span>Contul meu</span>
-          {/* O sageata simpla */}
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          
+          <span className="font-semibold text-sm">
+            {user ? (user.firstName || user.name || "Contul meu") : "Autentificare"}
+          </span>
+
           <svg
-            className={`w-4 h-4 transition-transform ${
-              isDropdownOpen ? "rotate-180" : ""
-            }`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+            className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
+            fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </button>
 
-        {/* Dropdown-ul (randat conditionat) */}
+        {/* Dropdown-ul */}
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-            <a
-              href="#profil"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Profil
-            </a>
-            <a
-              href="#setari"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Setări
-            </a>
-            <div className="border-t border-gray-100 my-1"></div>
-            <a
-              href="#logout"
-              className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-            >
-              Logout
-            </a>
+          <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl py-2 z-50 border border-neutral-100 ring-1 ring-black ring-opacity-5">
+            {user ? (
+              <>
+                <div className="px-4 py-3 border-b border-neutral-50 mb-1">
+                  <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">User</p>
+                  <p className="text-sm font-semibold truncate text-neutral-800">{user.email}</p>
+                </div>
+                
+                <button
+                  onClick={() => { navigate(ROUTES.ACCOUNT); setIsDropdownOpen(false); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-neutral-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors flex items-center gap-2"
+                >
+                  My Profile
+                </button>
+
+                <div className="border-t border-neutral-100 my-1"></div>
+                
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors flex items-center gap-2"
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => { navigate(ROUTES.LOGIN); setIsDropdownOpen(false); }}
+                className="w-full text-left px-4 py-2.5 text-sm text-indigo-600 font-bold hover:bg-indigo-50"
+              >
+                Log In
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -16,6 +16,7 @@ import { CheckoutPage } from "../pages/Checkout/CheckoutPage";
 import { SellerPage } from "../pages/Seller/SellerPage";
 import { OrderPage } from "../pages/Order/OrderPage";
 import { ResetPasswordPage } from "../pages/Auth/ResetPasswordPage";
+import AdminRoute from "./AdminRoute";
 
 // Import Admin Panel components
 import AdminLayout from "../AdminPanel/AdminLayout";
@@ -51,12 +52,14 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
       </Route>
 
-      {/* --- Admin Panel Routes --- */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="users" element={<Users />} />
-        <Route path="products" element={<Products />} />
+      {/* --- Admin routes (private and only for admins) --- */}
+      <Route element={<AdminRoute />}> 
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="products" element={<Products />} />
+        </Route>
       </Route>
     </Routes>
   );
