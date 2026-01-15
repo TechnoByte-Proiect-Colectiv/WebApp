@@ -26,7 +26,7 @@ import { ReviewService } from "../../services/ReviewService";
 const roleType = {
   user: "Client",
   admin: "Administrator",
-  seller: "Seller",
+  // seller: "Seller",
 };
 
 export const UserPage: React.FC = () => {
@@ -166,7 +166,7 @@ export const UserPage: React.FC = () => {
             <Typography variant="subtitle1">{user.email}</Typography>
             <Chip
               icon={<PermIdentityIcon />}
-              label={roleType[user.role]}
+              label={roleType[user.isAdmin ? "admin" : "user"]}
               variant="outlined"
               sx={{
                 mt: 1,

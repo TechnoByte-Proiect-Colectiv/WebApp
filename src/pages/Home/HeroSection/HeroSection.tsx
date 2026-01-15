@@ -3,6 +3,7 @@ import React from "react";
 import { AnimatedCanvas } from "./AnimatedCanvas";
 import { HeroContent } from "./HeroContent";
 import { HeroSectionProps } from "../../../types/home/types";
+import { useNavigate } from "react-router-dom";
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   title = "PROMOTION TITLE",
@@ -10,11 +11,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   buttonText = "Shop Now",
   onButtonClick,
 }) => {
+  const navigate = useNavigate();
+
   const handlePromotionClick = () => {
     if (onButtonClick) {
       onButtonClick();
     } else {
-      window.open("https://google.ro", "_blank");
+      navigate("/products");
     }
   };
 
