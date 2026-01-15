@@ -21,6 +21,7 @@ import { OrderSummaryCardProps } from "../../components/features/order/OrderSumm
 import { OrderGridComponent } from "../../components/features/order/OrderGridComponent";
 import { useAddressManagement } from "../../hooks/useAddressManagement";
 import { AddressFormDialog } from "../../components/common/AddressFormDialog";
+import { ReviewService } from "../../services/ReviewService";
 
 const roleType = {
   user: "Client",
@@ -55,15 +56,32 @@ export const UserPage: React.FC = () => {
   const [openAbout, setOpenAbout] = useState(false);
   const [openAddresses, setOpenAddresses] = useState(false);
 
-  const [about, setAbout] = useState<string>("No information provided.");
+  const [about, setAbout] = useState<string>();
   const [orders, setOrders] = useState<OrderSummaryCardProps[]>([]);
+  const [userReviews, setUserReviews] = useState<any[]>([]);
 
   const navigate = useNavigate();
 
   const { logout } = useAuth();
 
+  const fetchReviews = async () => {
+        try {
+            const data = await ReviewService.getMyReviews();
+            setUserReviews(data);
+        } catch (e) { console.error(e); }
+  };
+
   useEffect(() => {
-    const fetch = async () => {
+    if (user && user.createdAt) {
+      const date = new Date(user.createdAt);
+      const formattedDate = date.toLocaleDateString("ro-RO") + " at " + 
+                            date.toLocaleTimeString("ro-RO", { hour: '2-digit', minute: '2-digit' });
+      
+      setAbout(formattedDate);
+    }
+
+    // fetch user addresses
+    const fetchAddrs = async () => {
       try {
         const list = await userService.getUserAddresses();
         setAddressList(list);
@@ -71,19 +89,9 @@ export const UserPage: React.FC = () => {
         /* fallback  */
       }
     };
-    fetch();
+    fetchAddrs();
 
-    if (user && user.createdAt) {
-      const aboutStr =
-        "Account created on " +
-        user.createdAt.split("T")[0] +
-        " at " +
-        user.createdAt.split("T")[1].split("Z")[0];
-      setAbout(aboutStr);
-    }
-
-    //fetch userOrders
-
+    //fetch user Orders
     const fetchOrders = async () => {
       try {
         const data = await userService.getMyOrders();
@@ -107,6 +115,9 @@ export const UserPage: React.FC = () => {
       }
     };
     fetchOrders();
+
+    // fetch reviews 
+    fetchReviews();
   }, [user]);
 
   if (!user) {
@@ -243,27 +254,31 @@ export const UserPage: React.FC = () => {
           </Button>
           <Collapse in={openReviews}>
             <Box mt={1} display="flex" flexDirection="column" gap={1}>
-              {reviews.length === 0 ? (
+              {userReviews.length === 0 ? (
                 <Typography>No reviews yet.</Typography>
               ) : (
-                reviews.map((review, idx) => (
+                userReviews.map((review, idx) => (
                   <Card key={idx}>
-                    <CardContent
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
+                    <CardContent sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Box>
-                        <Typography>{`Review #${idx + 1}`}</Typography>
-                        <Typography>{`Created At: N/A`}</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold">{review.title}</Typography>
+                        <Typography variant="body2">{review.description}</Typography>
+                        <Typography variant="caption">Product ID: {review.productId}</Typography>
                       </Box>
-                      <Box display="flex" gap={1}>
-                        <Button variant="outlined" size="small" color="primary">
-                          Edit
-                        </Button>
-                        <Button variant="outlined" size="small" color="error">
+                      <Box display="flex" gap={1} alignItems="center">
+                        <Button 
+                          color="error" 
+                          onClick={async () => {
+                            if (window.confirm("Are you sure you want to delete this review?")) {
+                              try {
+                                await ReviewService.deleteReview(review.productId);
+                                await fetchReviews(); 
+                              } catch (e) {
+                                alert("The review cannot be deleted.");
+                              }
+                            }
+                          }}
+                        >
                           Delete
                         </Button>
                       </Box>
@@ -362,8 +377,20 @@ export const UserPage: React.FC = () => {
             {openAbout ? "-" : "+"} About My Account
           </Button>
           <Collapse in={openAbout}>
-            <Box mt={1}>
-              <Typography>{about}</Typography>
+            <Box mt={1} sx={{ pl: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
+                Account created at:
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {about}
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
+                Additional Information:
+              </Typography>
+              <Typography variant="body1" sx={{ fontStyle: 'italic', color: 'gray' }}>
+                No other information provided.
+              </Typography>
             </Box>
           </Collapse>
         </Box>

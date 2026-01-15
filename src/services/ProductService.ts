@@ -38,7 +38,7 @@ export const ProductService = {
   },
 
   getReviewsForProduct: async (id: number): Promise<Review[]> => {
-    const response = await fetch(`${API_URL}/review/${id}`);
+    const response = await fetch(`${API_URL}/review/product/${id}`);
     if(!response.ok) throw new Error("Error receiving reviews for product");
     
     return response.json();
