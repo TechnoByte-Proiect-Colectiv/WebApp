@@ -23,6 +23,7 @@ import AdminLayout from "../AdminPanel/AdminLayout";
 import Dashboard from "../AdminPanel/pages/Dashboard";
 import Users from "../AdminPanel/pages/Users";
 import Products from "../AdminPanel/pages/Products";
+import Orders from "../AdminPanel/pages/Orders";
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -59,6 +60,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="products" element={<Products />} />
+          <Route path="orders" element={<Orders />} />
         </Route>
       </Route>
     </Routes>
